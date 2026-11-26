@@ -1,0 +1,3398 @@
+{
+  "hr.expense": {
+    "model_info": {
+      "id": 949,
+      "model": "hr.expense",
+      "name": "Expense",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 4970,
+        "name": "hr.expense.activity",
+        "type": "activity",
+        "arch": "<activity string=\"Expenses\">\n                    <field name=\"employee_id\"/>\n                    <field name=\"currency_id\"/>\n                    <templates>\n                        <div t-name=\"activity-box\">\n                            <img class=\"rounded\" t-att-src=\"activity_image('hr.employee', 'avatar_128', record.employee_id.raw_value)\" t-att-title=\"record.employee_id.value\" t-att-alt=\"record.employee_id.value\"/>\n                            <div class=\"ms-2\">\n                                <field name=\"name\" display=\"full\" class=\"o_text_block\"/>\n                                <field name=\"total_amount_currency\" widget=\"monetary\" muted=\"1\" display=\"full\"/>\n                            </div>\n                        </div>\n                    </templates>\n                </activity>",
+        "priority": 16
+      },
+      {
+        "id": 4968,
+        "name": "hr.expense.graph",
+        "type": "graph",
+        "arch": "<graph string=\"Expenses Analysis\" sample=\"1\">\n                    <field name=\"price_unit\" invisible=\"1\"/>\n                    <field name=\"quantity\" invisible=\"1\"/>\n                    <field name=\"date\"/>\n                    <field name=\"employee_id\"/>\n                    <field name=\"total_amount\" type=\"measure\"/>\n                    <field name=\"tax_amount\"/>\n                </graph>",
+        "priority": 16
+      },
+      {
+        "id": 4963,
+        "name": "hr.expense.kanban",
+        "type": "kanban",
+        "arch": "<kanban class=\"o_kanban_mobile\" sample=\"1\" js_class=\"hr_expense_kanban\" quick_create=\"false\">\n                    <field name=\"currency_id\"/>\n                    <progressbar field=\"activity_state\" colors=\"{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}\"/>\n                    <templates>\n                        <t t-name=\"card\">\n                            <div class=\"d-flex align-items-baseline\">\n                                <field class=\"fw-bold fs-5 me-2\" name=\"name\"/>\n                                <field class=\"fw-bold ms-auto flex-shrink-0\" name=\"total_amount_currency\" widget=\"monetary\"/>\n                            </div>\n                            <div class=\"d-flex mt8 text-muted\">\n                                <field name=\"employee_id\" widget=\"many2one_avatar_employee\" options=\"{'display_avatar_name': True}\" readonly=\"True\"/>\n                                <field class=\"ms-auto\" name=\"state\" widget=\"label_selection\" options=\"{'classes': {                                         'draft': 'default', 'submitted': 'warning', 'refused': 'danger', 'posted': 'warning',                                         'approved': 'success', 'in_payment': 'success', 'paid': 'success'}}\"/>\n                            </div>\n                            <field class=\"mt8 text-muted\" name=\"date\"/>\n                        </t>\n                    </templates>\n                </kanban>",
+        "priority": 16
+      },
+      {
+        "id": 4964,
+        "name": "hr.expense.kanban",
+        "type": "kanban",
+        "arch": "<data><xpath expr=\"//templates//field[@name='employee_id']\" position=\"attributes\">\n                    <attribute name=\"invisible\">True</attribute>\n                </xpath>\n                <xpath expr=\"//templates//field[@name='state']\" position=\"attributes\">\n                    <attribute name=\"invisible\">True</attribute>\n                </xpath>\n            </data>",
+        "priority": 16
+      },
+      {
+        "id": 4965,
+        "name": "hr.expense.kanban",
+        "type": "kanban",
+        "arch": "<xpath expr=\"//kanban\" position=\"attributes\">\n                    <attribute name=\"js_class\">hr_expense_kanban</attribute>\n                </xpath>",
+        "priority": 16
+      },
+      {
+        "id": 4966,
+        "name": "hr.expense.kanban",
+        "type": "kanban",
+        "arch": "<xpath expr=\"//kanban\" position=\"attributes\">\n                    <attribute name=\"js_class\">hr_expense_dashboard_kanban</attribute>\n                </xpath>",
+        "priority": 16
+      },
+      {
+        "id": 4958,
+        "name": "hr.expense.list",
+        "type": "list",
+        "arch": "<list string=\"Expenses\" multi_edit=\"1\" sample=\"1\" js_class=\"hr_expense_tree\" decoration-info=\"state == 'draft'\">\n                    <field name=\"is_editable\" column_invisible=\"True\"/>\n                    <field name=\"company_id\" column_invisible=\"True\"/>\n                    <field name=\"company_currency_id\" column_invisible=\"True\"/>\n                    <field name=\"nb_attachment\" column_invisible=\"True\"/>\n                    <field name=\"is_multiple_currency\" column_invisible=\"True\"/>\n                    <field name=\"product_has_cost\" column_invisible=\"True\"/>\n                    <field name=\"selectable_payment_method_line_ids\" column_invisible=\"True\"/>\n\n                    <!--  Always Shown start -->\n                    <field name=\"employee_id\" widget=\"many2one_avatar_employee\" readonly=\"not is_editable\"/>\n                    <field name=\"name\" readonly=\"not is_editable\"/>\n\n                    <!--  Optional -->\n                    <field name=\"department_id\" optional=\"hide\" readonly=\"True\"/>\n                    <field name=\"date\" optional=\"show\" readonly=\"not is_editable\"/>\n                    <field name=\"product_id\" optional=\"show\" readonly=\"not is_editable\" required=\"1\"/>\n                    <field name=\"payment_mode\" optional=\"show\" readonly=\"not is_editable\"/>\n                    <field name=\"activity_ids\" widget=\"list_activity\" optional=\"show\"/>\n                    <field name=\"analytic_distribution\" widget=\"analytic_distribution\" optional=\"show\" groups=\"analytic.group_analytic_accounting\" readonly=\"not is_editable\" options=\"{'product_field': 'product_id', 'business_domain': 'expense'}\"/>\n                    <field name=\"account_id\" optional=\"hide\" groups=\"account.group_account_readonly\" readonly=\"not is_editable\"/>\n                    <field name=\"journal_id\" optional=\"hide\" groups=\"account.group_account_readonly\" readonly=\"True\"/>\n                    <field name=\"payment_method_line_id\" optional=\"hide\" groups=\"account.group_account_readonly\" readonly=\"not is_editable\"/>\n                    <field name=\"manager_id\" optional=\"hide\" readonly=\"not is_editable\"/>\n                    <field name=\"company_id\" optional=\"show\" groups=\"base.group_multi_company\" readonly=\"True\"/>\n                    <field name=\"price_unit\" string=\"Unit Price\" optional=\"hide\" widget=\"monetary\" options=\"{'currency_field': 'company_currency_id', 'field_digits': True}\" readonly=\"True\"/>\n                    <field name=\"quantity\" optional=\"hide\" readonly=\"not is_editable or not product_has_cost\"/>\n                    <field name=\"tax_ids\" optional=\"hide\" widget=\"many2many_tax_tags\" groups=\"account.group_account_invoice,account.group_account_readonly\" readonly=\"not is_editable or not product_has_cost\"/>\n                    <field name=\"tax_amount\" sum=\"Total Taxes\" readonly=\"True\" optional=\"hide\" groups=\"account.group_account_invoice,account.group_account_readonly\"/>\n                    <field name=\"nb_attachment\" widget=\"nb_attachment\" nolabel=\"1\" readonly=\"True\"/>\n                    <field name=\"total_amount\" sum=\"Total Amount\" widget=\"monetary\" readonly=\"not is_editable or product_has_cost\" options=\"{'currency_field': 'company_currency_id'}\" decoration-bf=\"1\"/>\n                    <field name=\"total_amount_currency\" widget=\"monetary\" readonly=\"not is_editable or not is_multiple_currency or product_has_cost\" options=\"{'currency_field': 'currency_id'}\" optional=\"hide\" decoration-bf=\"1\" groups=\"base.group_multi_currency\"/>\n                    <field name=\"currency_id\" optional=\"hide\" readonly=\"not is_editable or product_has_cost\" groups=\"base.group_multi_currency\"/>\n                    <!--  Always Shown end -->\n                    <field name=\"state\" optional=\"show\" readonly=\"True\" decoration-info=\"state == 'draft'\" decoration-success=\"state in ['approved', 'posted', 'in_payment', 'paid']\" decoration-warning=\"state == 'submitted'\" decoration-danger=\"state == 'refused'\" widget=\"badge\"/>\n                </list>",
+        "priority": 16
+      },
+      {
+        "id": 4959,
+        "name": "hr.expense.list",
+        "type": "list",
+        "arch": "<xpath expr=\"//list\" position=\"attributes\">\n                    <!-- Display the tree dashboard view with the header -->\n                    <attribute name=\"js_class\">hr_expense_dashboard_tree</attribute>\n                </xpath>",
+        "priority": 16
+      },
+      {
+        "id": 4985,
+        "name": "hr.expense.list.inherit.sale.expense",
+        "type": "list",
+        "arch": "<xpath expr=\"//field[@name='date']\" position=\"before\">\n                <field name=\"sale_order_id\" optional=\"hide\" invisible=\"not can_be_reinvoiced\" readonly=\"state in ['posted', 'refused']\" options=\"{'no_create_edit': True, 'no_create': True, 'no_open': True}\" context=\"{'sale_show_partner_name': True, 'sale_expense_all_order': True}\"/>\n                <field name=\"can_be_reinvoiced\" readonly=\"1\" column_invisible=\"True\"/>\n            </xpath>",
+        "priority": 16
+      },
+      {
+        "id": 4967,
+        "name": "hr.expense.pivot",
+        "type": "pivot",
+        "arch": "<pivot string=\"Expenses Analysis\" sample=\"1\">\n                    <field name=\"employee_id\" type=\"row\"/>\n                    <field name=\"date\" interval=\"month\" type=\"col\"/>\n                    <field name=\"total_amount_currency\" type=\"measure\"/>\n                </pivot>",
+        "priority": 16
+      },
+      {
+        "id": 4961,
+        "name": "hr.expense.view.form",
+        "type": "form",
+        "arch": "<form string=\"Expenses\" js_class=\"hr_expense_form_view\">\n                <header>\n                    <!-- Without attachments the attach_document comes first-->\n                    <button name=\"action_submit\" string=\"Submit\" type=\"object\" class=\"oe_highlight o_expense_submit_highlight\" invisible=\"nb_attachment == 0 or state != 'draft'\" data-hotkey=\"v\"/>\n                    <button name=\"action_approve\" string=\"Approve\" type=\"object\" data-hotkey=\"q\" context=\"{'validate_analytic': True}\" invisible=\"nb_attachment == 0 or not can_approve or state != 'submitted'\" class=\"oe_highlight o_expense_approve_highlight\"/>\n                    <button name=\"action_post\" string=\"Post Journal Entries\" type=\"object\" data-hotkey=\"y\" class=\"oe_highlight o_expense_post_highlight\" invisible=\"nb_attachment == 0 or state != 'approved'\" groups=\"account.group_account_invoice\"/>\n\n                    <!-- With attachments the attach document comes last-->\n                    <widget name=\"attach_document\" string=\"Attach Receipt\" action=\"attach_document\" highlight=\"1\" invisible=\"nb_attachment &gt;= 1\"/>\n                    <button name=\"action_submit\" string=\"Submit\" type=\"object\" class=\"o_expense_submit\" invisible=\"nb_attachment &gt;= 1 or state != 'draft'\" data-hotkey=\"v\"/>\n                    <button name=\"action_approve\" string=\"Approve\" type=\"object\" data-hotkey=\"q\" context=\"{'validate_analytic': True}\" invisible=\"nb_attachment &gt;= 1 or not can_approve or state != 'submitted'\" class=\"o_expense_approve\"/>\n                    <button name=\"action_post\" string=\"Post Journal Entries\" type=\"object\" data-hotkey=\"y\" class=\"o_expense_post\" invisible=\"nb_attachment  &gt;= 1 or state != 'approved'\" groups=\"account.group_account_invoice\"/>\n\n                    <button name=\"action_refuse\" string=\"Refuse\" invisible=\"state not in ('submitted', 'approved')\" type=\"object\" groups=\"hr_expense.group_hr_expense_team_approver\" class=\"o_expense_refuse\" data-hotkey=\"x\"/>\n                    <button name=\"action_reset\" string=\"Reset\" type=\"object\" data-hotkey=\"r\" invisible=\"not can_reset or state in 'draft'\" groups=\"account.group_account_invoice\"/>\n                    <!-- v In the case where the user has no accounting rights, we don't show the button in the post & done states  -->\n                    <button name=\"action_reset\" string=\"Reset\" type=\"object\" data-hotkey=\"r\" invisible=\"not can_reset or state in ('draft', 'posted', 'in_payment','paid')\" groups=\"!account.group_account_invoice\"/>\n                    <button name=\"action_split_wizard\" string=\"Split Expense\" type=\"object\" invisible=\"state != 'draft' or product_has_cost\" groups=\"!hr_expense.group_hr_expense_team_approver,!account.group_account_invoice\" class=\"o_expense_split_user\"/>\n                    <button name=\"action_split_wizard\" string=\"Split Expense\" type=\"object\" class=\"o_expense_split_manager\" invisible=\"state in ('in_payment', 'paid', 'refused', 'posted') or product_has_cost\" groups=\"hr_expense.group_hr_expense_team_approver,account.group_account_invoice\"/>\n\n                    <!-- With attachments the attach_document comes last -->\n                    <widget name=\"attach_document\" string=\"Attach Receipt\" action=\"attach_document\" invisible=\"nb_attachment == 0\"/>\n\n                    <!-- Statusbar -->\n                    <field name=\"state\" widget=\"statusbar\" statusbar_visible=\"draft,approved,posted,paid\" invisible=\"state in ('submitted', 'in_payment', 'refused')\"/>\n                    <field name=\"state\" widget=\"statusbar\" statusbar_visible=\"draft,submitted,approved,posted,paid\" invisible=\"state != 'submitted'\"/>\n                    <field name=\"state\" widget=\"statusbar\" statusbar_visible=\"draft,approved,posted,in_payment,paid\" invisible=\"state != 'in_payment'\"/>\n                    <field name=\"state\" widget=\"statusbar\" statusbar_visible=\"draft,approved,posted,paid,refused\" invisible=\"state != 'refused'\"/>\n                </header>\n                <div class=\"alert alert-warning oe_edit_only\" role=\"alert\" name=\"warning_duplicate_receipt_expense\" invisible=\"not same_receipt_expense_ids\">\n                    An <a type=\"object\" name=\"action_show_same_receipt_expense_ids\">expense</a> with the same receipt already exists.\n                </div>\n                <sheet>\n                    <div class=\"oe_button_box\" name=\"button_box\">\n                        <button name=\"action_open_split_expense\" type=\"object\" class=\"oe_stat_button\" icon=\"fa-file-text-o\" invisible=\"not split_expense_origin_id\" string=\"Split\"/>\n                        <button name=\"action_open_account_move\" class=\"oe_stat_button\" icon=\"fa-bars\" type=\"object\" invisible=\"not account_move_id\" groups=\"account.group_account_invoice\">\n                            <div class=\"o_stat_info\">\n                                <span class=\"o_stat_text\">Journal Entry</span>\n                            </div>\n                        </button>\n                    </div>\n                    <div class=\"oe_title\">\n                        <label for=\"name\"/>\n                        <h1>\n                            <field name=\"name\" placeholder=\"e.g. Lunch with Customer\" readonly=\"not is_editable\"/>\n                        </h1>\n                    </div>\n                    <group>\n                        <group>\n                            <field name=\"product_has_cost\" invisible=\"1\"/>\n                            <field name=\"product_has_tax\" invisible=\"1\"/>\n                            <field name=\"is_multiple_currency\" invisible=\"1\"/>\n                            <field name=\"is_editable\" invisible=\"1\"/>\n                            <field name=\"currency_id\" invisible=\"1\"/>\n                            <field name=\"company_currency_id\" invisible=\"1\"/>\n                            <field name=\"tax_amount\" invisible=\"1\"/>\n                            <field name=\"price_unit\" invisible=\"1\"/>\n                            <field name=\"nb_attachment\" invisible=\"1\"/>\n                            <field name=\"total_amount\" invisible=\"1\"/>\n                            <field name=\"duplicate_expense_ids\" invisible=\"1\"/>\n                            <field name=\"currency_rate\" invisible=\"1\"/>\n                            <field name=\"selectable_payment_method_line_ids\" invisible=\"1\"/>\n\n                            <label for=\"product_id\"/>\n                            <div>\n                                <field name=\"product_id\" required=\"1\" readonly=\"not is_editable\" context=\"{                                         'default_type': 'service',                                         'default_can_be_expensed': 1,                                         'list_view_ref': 'hr_expense.product_product_expense_tree_view',                                         'form_view_ref': 'hr_expense.product_product_expense_form_view',                                     }\" class=\"w-100\"/>\n                                <div class=\"fst-italic\" invisible=\"not is_editable or not product_description or not product_id\">\n                                    <field name=\"product_description\"/>\n                                </div>\n                            </div>\n\n                            <!-- CASE: product has a cost defined -> user input qty (always in company currency) -->\n                            <field name=\"price_unit\" required=\"1\" widget=\"monetary\" options=\"{'currency_field': 'currency_id', 'field_digits': True}\" invisible=\"not product_has_cost\" readonly=\"True\"/>\n                            <label for=\"quantity\" invisible=\"not product_has_cost\"/>\n                            <div invisible=\"not product_has_cost\">\n                                <div class=\"o_row\">\n                                    <field name=\"quantity\" class=\"oe_inline\" readonly=\"not is_editable\"/>\n                                    <field name=\"product_uom_id\" required=\"1\" force_save=\"1\" options=\"{'no_open': True, 'no_create': True}\" groups=\"uom.group_uom\" readonly=\"not is_editable\" widget=\"many2one_uom\"/>\n                                </div>\n                            </div>\n\n                            <!-- CASE: product has no cost defined -> user input amount (in other currency if multi-currency) -->\n                            <label for=\"total_amount_currency\" string=\"Total\" invisible=\"product_has_cost\" readonly=\"not is_editable\"/>\n                            <div class=\"o_row\" invisible=\"product_has_cost\">\n                                <field name=\"total_amount_currency\" widget=\"monetary\" options=\"{'currency_field': 'currency_id'}\" readonly=\"not is_editable\" class=\"oe_inline mw-50 me-0\"/>\n                                <field name=\"currency_id\" class=\"mw-25 ms-0\" groups=\"base.group_multi_currency\" options=\"{'no_create': True, 'no_open': True}\" readonly=\"not is_editable\"/>\n                                <span class=\"d-flex\" invisible=\"tax_amount == 0\">(incl <field name=\"tax_amount\" class=\"mx-1\"/> tax)</span>\n                            </div>\n\n                            <!-- CASE: converter when currency is different than the company one -->\n                            <label name=\"total_amount_product_cost_label\" for=\"total_amount\" string=\"Total\" invisible=\"is_multiple_currency or not product_has_cost\"/>\n                            <label name=\"total_amount_multicurrency_label\" for=\"total_amount\" string=\"\" invisible=\"not is_multiple_currency\"/>\n                            <div class=\"o_row\" invisible=\"not is_multiple_currency and not product_has_cost\">\n                                <field name=\"total_amount\" widget=\"monetary\" options=\"{'currency_field': 'company_currency_id'}\" force_save=\"1\" readonly=\"not is_editable or product_has_cost\" class=\"oe_inline\"/>\n                                <field name=\"label_currency_rate\" class=\"ps-0\"/>\n                            </div>\n\n                            <label for=\"tax_ids\"/>\n                            <div class=\"o_row\">\n                                <field name=\"tax_ids\" force_save=\"1\" widget=\"many2many_tax_tags\" readonly=\"not is_editable\" options=\"{'no_create': True}\"/>\n                                <field name=\"tax_amount_currency\"/>\n                            </div>\n                            <field name=\"employee_id\" groups=\"!hr.group_hr_user\" context=\"{'default_company_id': company_id}\" widget=\"many2one_avatar_employee\" options=\"{'relation': 'hr.employee.public', 'no_create': True}\" readonly=\"not is_editable\"/>\n                            <field name=\"employee_id\" groups=\"hr.group_hr_user\" context=\"{'default_company_id': company_id}\" widget=\"many2one_avatar_employee\" options=\"{'relation': 'hr.employee'}\" readonly=\"not is_editable\"/>\n                            <label id=\"lo\" for=\"payment_mode\"/>\n                            <div id=\"payment_mode\">\n                                <field name=\"payment_mode\" widget=\"radio\" readonly=\"state != 'draft'\"/>\n                            </div>\n                        </group>\n                        <group>\n                            <field name=\"date\" readonly=\"not is_editable\" class=\"w-50\"/>\n                            <field name=\"company_id\" groups=\"base.group_multi_company\" readonly=\"state != 'draft'\"/>\n                            <field name=\"manager_id\" widget=\"many2one_avatar_user\" readonly=\"state != 'draft'\" placeholder=\"Auto-validation\"/>\n                            <field name=\"department_id\" invisible=\"1\" readonly=\"not is_editable\" context=\"{'default_company_id': company_id}\"/>\n                            <field name=\"vendor_id\" invisible=\"payment_mode != 'company_account'\"/>\n                            <field name=\"account_id\" options=\"{'no_create': True}\" domain=\"[('account_type', 'not in', ('asset_receivable','liability_payable','asset_cash','liability_credit_card')), ('company_ids', 'parent_of', company_id)]\" groups=\"account.group_account_readonly\" readonly=\"not is_editable\" context=\"{'default_company_id': company_id}\"/>\n                            <field name=\"payment_method_line_id\" options=\"{'no_open': True, 'no_create': True}\" invisible=\"payment_mode != 'company_account'\" readonly=\"not is_editable\" required=\"payment_mode == 'company_account'\"/>\n                            <field name=\"analytic_distribution\" widget=\"analytic_distribution\" groups=\"analytic.group_analytic_accounting\" options=\"{'product_field': 'product_id', 'account_field': 'account_id', 'business_domain': 'expense'}\" readonly=\"not is_editable\"/>\n                        </group>\n                    </group>\n                    <div>\n                        <field name=\"description\" placeholder=\"Notes...\" readonly=\"not is_editable\"/>\n                    </div>\n                </sheet>\n                <div class=\"o_attachment_preview o_center_attachment\"/>\n                <chatter/>\n                </form>",
+        "priority": 16
+      },
+      {
+        "id": 4969,
+        "name": "hr.expense.view.search",
+        "type": "search",
+        "arch": "<search string=\"Expense\">\n                    <!-- Search -->\n                    <field name=\"name\" filter_domain=\"[('name', 'ilike', self)]\" string=\"Expense\"/>\n                    <field name=\"department_id\" filter_domain=\"[('department_id.name', 'ilike', self)]\"/>\n                    <field name=\"company_id\" filter_domain=\"[('company_id.name', 'ilike', self)]\" groups=\"base.group_multi_company\"/>\n                    <field name=\"employee_id\" filter_domain=\"[('employee_id.name', 'ilike', self)]\"/>\n\n                    <!-- Filters -->\n                    <filter string=\"My Expenses\" name=\"my_open_expenses\" domain=\"[('employee_id.user_id', '=', uid)]\"/>\n                    <filter string=\"My Team\" name=\"my_team_expenses\" domain=\"[('employee_id.parent_id.user_id', '=', uid)]\" groups=\"hr_expense.group_hr_expense_team_approver\" help=\"Expenses of Your Team Member\"/>\n                    <separator/>\n                    <filter string=\"Paid by Company\" name=\"by_company\" domain=\"[('payment_mode', '=', 'company_account')]\"/>\n                    <filter string=\"Paid by Employee\" name=\"by_employee\" domain=\"[('payment_mode', '=', 'own_account')]\"/>\n                    <separator/>\n                    <filter string=\"To Submit\" name=\"draft\" domain=\"[('state', '=', 'draft')]\"/>\n                    <filter string=\"Waiting Approval\" name=\"submitted\" domain=\"[('state', '=', 'submitted')]\"/>\n                    <filter string=\"To Post\" name=\"approved\" domain=\"[('state', '=', 'approved')]\"/>\n                    <filter string=\"Waiting Reimbursement\" name=\"to_pay\" domain=\"[('state', '=', 'approved'), ('payment_mode', '=', 'own_account')]\"/>\n                    <separator/>\n                    <filter string=\"Expense Date\" name=\"date\" date=\"date\"/>\n                    <separator/>\n                    <!-- Invisible filters -->\n                    <filter string=\"All to Post\" name=\"all_approved\" domain=\"[('state', '=', 'approved')]\" invisible=\"True\"/>\n                    <filter string=\"All to Pay\" name=\"all_to_pay\" domain=\"[('state', '=', 'posted'), ('payment_mode', '=', 'own_account')]\" invisible=\"True\"/>\n                    <filter string=\"All Paid\" name=\"all_paid\" domain=\"[('state', 'in', ['in_payment', 'paid']), ('payment_mode', '=', 'own_account')]\" invisible=\"True\"/>\n\n                    <filter invisible=\"1\" string=\"My Activities\" name=\"filter_activities_my\" domain=\"[('activity_user_id', '=', uid)]\"/>\n                    <separator invisible=\"1\"/>\n                    <filter invisible=\"1\" string=\"Late Activities\" name=\"activities_overdue\" domain=\"[('my_activity_date_deadline', '&lt;', 'today')]\" help=\"Show all records whose next activity date is past\"/>\n                    <filter invisible=\"1\" string=\"Today Activities\" name=\"activities_today\" domain=\"[('my_activity_date_deadline', '=', 'today')]\"/>\n                    <filter invisible=\"1\" string=\"Future Activities\" name=\"activities_upcoming_all\" domain=\"[('my_activity_date_deadline', '&gt;', 'today')]\"/>\n\n                    <!-- Group bys -->\n                    <group name=\"group_filters\">\n                        <filter string=\"Employee\" name=\"employee\" domain=\"[]\" context=\"{'group_by': 'employee_id'}\"/>\n                        <filter string=\"Category\" name=\"product\" domain=\"[]\" context=\"{'group_by': 'product_id'}\"/>\n                        <filter string=\"Status\" name=\"status\" domain=\"[]\" context=\"{'group_by': 'state'}\"/>\n                        <filter string=\"Expense Date\" name=\"expensesmonth\" domain=\"[]\" context=\"{'group_by': 'date'}\" help=\"Expense Date\"/>\n                        <filter string=\"Company\" name=\"company\" domain=\"[]\" context=\"{'group_by': 'company_id'}\" groups=\"base.group_multi_company\"/>\n                        <filter string=\"Department\" name=\"department\" domain=\"[]\" context=\"{'group_by': 'department_id'}\"/>\n                    </group>\n                </search>",
+        "priority": 16
+      },
+      {
+        "id": 4971,
+        "name": "hr.expense.view.search.with.panel",
+        "type": "search",
+        "arch": "<xpath expr=\"//group[@name='group_filters']\" position=\"after\">\n                    <searchpanel>\n                        <field name=\"state\" expand=\"1\" select=\"multi\" icon=\"fa-check-square-o\" enable_counters=\"1\"/>\n                        <field name=\"employee_id\" limit=\"20\" hierarchize=\"0\" select=\"one\" icon=\"fa-users\"/>\n                        <field name=\"company_id\" expand=\"1\" icon=\"fa-building\" groups=\"base.group_multi_company\"/>\n                    </searchpanel>\n                </xpath>",
+        "priority": 16
+      },
+      {
+        "id": 4960,
+        "name": "hr.expense.list",
+        "type": "list",
+        "arch": "<xpath expr=\"//list\" position=\"attributes\">\n                    <!-- Display the tree dashboard view with the header -->\n                    <attribute name=\"js_class\">hr_expense_dashboard_tree</attribute>\n                </xpath>",
+        "priority": 20
+      },
+      {
+        "id": 4984,
+        "name": "hr.expense.form.inherit.sale.expense",
+        "type": "form",
+        "arch": "<data><button name=\"action_open_account_move\" position=\"after\">\n                <button name=\"action_open_sale_order\" groups=\"sales_team.group_sale_salesman\" class=\"oe_stat_button\" icon=\"fa-money\" type=\"object\" invisible=\"not sale_order_id\">\n                    <field name=\"sale_order_id\" widget=\"statinfo\" string=\"Sales Order\" context=\"{                            'sale_show_partner_name': True,                            'list_view_ref': 'sale_expense.sale_order_reinvoice_tree_view',                            }\"/>\n                </button>\n            </button>\n            <xpath expr=\"//field[@name='analytic_distribution']\" position=\"before\">\n                <field name=\"sale_order_id\" invisible=\"not can_be_reinvoiced\" readonly=\"not is_editable\" options=\"{'no_create_edit': True, 'no_create': True, 'no_open': True}\" context=\"{                         'sale_show_partner_name': True,                         'sale_expense_all_order': True,                         'list_view_ref': 'sale_expense.sale_order_reinvoice_tree_view'                     }\"/>\n                <field name=\"can_be_reinvoiced\" invisible=\"1\"/>\n            </xpath>\n        </data>",
+        "priority": 30
+      },
+      {
+        "id": 4962,
+        "name": "hr.expense.view.form",
+        "type": "form",
+        "arch": "<data><xpath expr=\"/form/header\" position=\"attributes\">\n                    <attribute name=\"invisible\">1</attribute>\n                </xpath>\n                <field name=\"employee_id\" position=\"attributes\">\n                    <attribute name=\"readonly\">1</attribute>\n                </field>\n                <field name=\"company_id\" position=\"attributes\">\n                    <attribute name=\"readonly\">1</attribute>\n                </field>\n            </data>",
+        "priority": 35
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1009,
+        "name": "HR Expense: Send Submitted Expenses Mail",
+        "state": "code",
+        "code": "model._cron_send_submitted_expenses_mail()"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1016,
+        "name": "Employee Expenses",
+        "view_mode": "list,kanban,form,pivot,graph",
+        "target": "current",
+        "context": "{\n                'search_default_all_approved': 1,\n                'search_default_all_to_pay': 1,\n            }\n            "
+      },
+      {
+        "id": 1018,
+        "name": "Expense Analysis",
+        "view_mode": "graph,pivot",
+        "target": "current",
+        "context": "{\n                'search_default_department_id': [active_id],\n                'default_department_id': active_id}\n            "
+      },
+      {
+        "id": 1023,
+        "name": "Expenses",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{'default_sale_order_id': active_id}"
+      },
+      {
+        "id": 1015,
+        "name": "Expenses Analysis",
+        "view_mode": "graph,pivot,list,form",
+        "target": "current",
+        "context": "{ 'searchpanel_default_state': [\"draft\", \"submitted\", \"approve\", \"posted\", \"in_payment\", \"paid\"] }"
+      },
+      {
+        "id": 1014,
+        "name": "Expenses to Process",
+        "view_mode": "list,kanban,form,graph,pivot,activity",
+        "target": "current",
+        "context": "{'searchpanel_default_state': ['submitted']}"
+      },
+      {
+        "id": 1017,
+        "name": "Expense to Approve",
+        "view_mode": "list,kanban,form,pivot,graph",
+        "target": "current",
+        "context": "{ 'searchpanel_default_state': [\"submitted\"] }"
+      },
+      {
+        "id": 1013,
+        "name": "My Expenses",
+        "view_mode": "list,kanban,form,graph,pivot,activity",
+        "target": "current",
+        "context": "{'search_default_my_open_expenses': 1}"
+      }
+    ]
+  },
+  "mail.tracking.duration.mixin": {
+    "model_info": {
+      "id": 170,
+      "model": "mail.tracking.duration.mixin",
+      "name": "Mixin to compute the time a record has spent in each value a many2one field can take",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "rating.mixin": {
+    "model_info": {
+      "id": 633,
+      "model": "rating.mixin",
+      "name": "Rating Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.account_financial_report.abstract_report_xlsx": {
+    "model_info": {
+      "id": 1213,
+      "model": "report.account_financial_report.abstract_report_xlsx",
+      "name": "Abstract XLSX Account Financial Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.report_xlsx.abstract": {
+    "model_info": {
+      "id": 972,
+      "model": "report.report_xlsx.abstract",
+      "name": "Abstract XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "eh.account.report.execution": {
+    "model_info": {
+      "id": 1242,
+      "model": "eh.account.report.execution",
+      "name": "Accounting report execution audit log",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 5321,
+        "name": "eh.account.report.execution.form",
+        "type": "form",
+        "arch": "<form string=\"Report Execution\" create=\"0\" edit=\"0\">\n                <sheet>\n                    <h1>\n                        <field name=\"display_name\" readonly=\"1\"/>\n                    </h1>\n                    <group>\n                        <group string=\"Execution\">\n                            <field name=\"report_code\"/>\n                            <field name=\"executed_at\"/>\n                            <field name=\"executed_by\"/>\n                            <field name=\"company_ids\" widget=\"many2many_tags\"/>\n                            <field name=\"result_format\"/>\n                            <field name=\"state\"/>\n                        </group>\n                        <group string=\"Result\">\n                            <field name=\"duration_ms\"/>\n                            <field name=\"row_count\"/>\n                            <field name=\"move_version_at_start\"/>\n                            <field name=\"options_hash\"/>\n                            <field name=\"result_hash\"/>\n                        </group>\n                    </group>\n                    <notebook>\n                        <page string=\"Options Snapshot\">\n                            <field name=\"options_snapshot\" widget=\"text\" readonly=\"1\"/>\n                        </page>\n                        <page string=\"Error\" invisible=\"state != 'error'\">\n                            <field name=\"error_message\" widget=\"text\" readonly=\"1\"/>\n                        </page>\n                    </notebook>\n                </sheet>\n            </form>",
+        "priority": 16
+      },
+      {
+        "id": 5320,
+        "name": "eh.account.report.execution.list",
+        "type": "list",
+        "arch": "<list string=\"Report Executions\" default_order=\"executed_at desc\" sample=\"1\" create=\"0\" edit=\"0\">\n                <field name=\"executed_at\"/>\n                <field name=\"report_code\"/>\n                <field name=\"name\"/>\n                <field name=\"executed_by\"/>\n                <field name=\"state\" widget=\"badge\" decoration-success=\"state == 'done'\" decoration-warning=\"state == 'running'\" decoration-danger=\"state == 'error'\"/>\n                <field name=\"duration_ms\" sum=\"Total ms\"/>\n                <field name=\"row_count\" sum=\"Total rows\"/>\n                <field name=\"result_format\"/>\n            </list>",
+        "priority": 16
+      },
+      {
+        "id": 5322,
+        "name": "eh.account.report.execution.search",
+        "type": "search",
+        "arch": "<search>\n                <field name=\"report_code\"/>\n                <field name=\"name\"/>\n                <field name=\"executed_by\"/>\n                <field name=\"options_hash\"/>\n                <filter name=\"filter_done\" string=\"Done\" domain=\"[('state', '=', 'done')]\"/>\n                <filter name=\"filter_running\" string=\"Running\" domain=\"[('state', '=', 'running')]\"/>\n                <filter name=\"filter_error\" string=\"Error\" domain=\"[('state', '=', 'error')]\"/>\n                <separator/>\n                <filter name=\"filter_today\" string=\"Today\" domain=\"[('executed_at', '&gt;=', context_today().strftime('%Y-%m-%d'))]\"/>\n                <filter name=\"filter_last_7_days\" string=\"Last 7 Days\" domain=\"[('executed_at', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]\"/>\n                <group>\n                    <filter name=\"group_report_code\" string=\"Report\" context=\"{'group_by': 'report_code'}\"/>\n                    <filter name=\"group_state\" string=\"Status\" context=\"{'group_by': 'state'}\"/>\n                    <filter name=\"group_executed_by\" string=\"User\" context=\"{'group_by': 'executed_by'}\"/>\n                </group>\n            </search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 1171,
+        "name": "Report Audit Log",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{'search_default_filter_last_7_days': 1}"
+      }
+    ]
+  },
+  "account.report.expression": {
+    "model_info": {
+      "id": 544,
+      "model": "account.report.expression",
+      "name": "Accounting Report Expression",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.report.external.value": {
+    "model_info": {
+      "id": 546,
+      "model": "account.report.external.value",
+      "name": "Accounting Report External Value",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.lock_exception": {
+    "model_info": {
+      "id": 522,
+      "model": "account.lock_exception",
+      "name": "Account Lock Exception",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 1056,
+        "name": "account.lock_exception.form",
+        "type": "form",
+        "arch": "<form string=\"Account Lock Exception\">\n                    <header>\n                        <field name=\"active\" invisible=\"True\"/>\n                        <field name=\"state\" widget=\"statusbar\" statusbar_visible=\"active,expired\" invisible=\"not active\"/>\n                        <button string=\"Revoke\" invisible=\"state != 'active'\" class=\"btn-secondary\" type=\"object\" name=\"action_revoke\"/>\n                    </header>\n                    <sheet>\n                        <widget name=\"web_ribbon\" title=\"Revoked\" bg_color=\"bg-danger\" invisible=\"active\"/>\n                        <div class=\"oe_button_box\" name=\"button_box\">\n                            <button class=\"oe_stat_button\" name=\"action_show_audit_trail_during_exception\" type=\"object\" icon=\"fa-bars\">\n                                <div class=\"o_stat_info\">\n                                    <span class=\"o_stat_text\">\n                                        Audit\n                                    </span>\n                                </div>\n                            </button>\n                        </div>\n                        <div>\n                            <div class=\"oe_title\">\n                                <h2><field name=\"display_name\" decoration-bf=\"1\"/></h2>\n                            </div>\n                            <group>\n                                <group>\n                                    <field name=\"create_uid\" readonly=\"True\"/>\n                                    <label for=\"user_id\" string=\"Valid for\"/>\n                                    <field name=\"user_id\" readonly=\"True\" invisible=\"not user_id\" nolabel=\"1\"/>\n                                    <span invisible=\"user_id\">everyone</span>\n                                    <field name=\"reason\" readonly=\"True\" invisible=\"not reason\"/>\n                                    <field name=\"create_date\" readonly=\"True\"/>\n                                    <field name=\"end_datetime\" readonly=\"True\"/>\n                                </group>\n                                <group>\n                                    <div colspan=\"2\" class=\"o_wrap_label\">\n                                        <span class=\"o_form_label\">Changed Lock Date:</span>\n                                    </div>\n\n                                    <div class=\"o_wrap_label\">\n                                        <field name=\"lock_date_field\" class=\"o_form_label o_form_label_readonly\" nolabel=\"1\" readonly=\"True\"/>\n                                    </div>\n                                    <div>\n                                        <field name=\"lock_date\" nolabel=\"1\" class=\"oe_inline\" readonly=\"True\"/>\n                                        <i class=\"text-muted\">\n                                        (from <field name=\"company_lock_date\" class=\"oe_inline\" readonly=\"True\"/>)\n                                        </i>\n                                    </div>\n                                </group>\n                            </group>\n                        </div>\n                    </sheet>\n                </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "mail.activity.mixin": {
+    "model_info": {
+      "id": 161,
+      "model": "mail.activity.mixin",
+      "name": "Activity Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "format.address.mixin": {
+    "model_info": {
+      "id": 88,
+      "model": "format.address.mixin",
+      "name": "Address Format",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_aged_partner_balance_xlsx": {
+    "model_info": {
+      "id": 1215,
+      "model": "report.a_f_r.report_aged_partner_balance_xlsx",
+      "name": "Aged Partner Balance XLSL Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "analytic.mixin": {
+    "model_info": {
+      "id": 496,
+      "model": "analytic.mixin",
+      "name": "Analytic Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "analytic.plan.fields.mixin": {
+    "model_info": {
+      "id": 494,
+      "model": "analytic.plan.fields.mixin",
+      "name": "Analytic Plan Fields",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_a_nz": {
+    "model_info": {
+      "id": 577,
+      "model": "account.edi.xml.ubl_a_nz",
+      "name": "A-NZ BIS Billing 3.0",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "eh.audit.mixin": {
+    "model_info": {
+      "id": 1236,
+      "model": "eh.audit.mixin",
+      "name": "Append-only audit row",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "sequence.mixin": {
+    "model_info": {
+      "id": 508,
+      "model": "sequence.mixin",
+      "name": "Automatic sequence",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "avatar.mixin": {
+    "model_info": {
+      "id": 82,
+      "model": "avatar.mixin",
+      "name": "Avatar Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "barcodes.barcode_events_mixin": {
+    "model_info": {
+      "id": 150,
+      "model": "barcodes.barcode_events_mixin",
+      "name": "Barcode Event Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_de": {
+    "model_info": {
+      "id": 574,
+      "model": "account.edi.xml.ubl_de",
+      "name": "BIS3 DE (XRechnung)",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.document.import.mixin": {
+    "model_info": {
+      "id": 509,
+      "model": "account.document.import.mixin",
+      "name": "Business document import mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "pos.bus.mixin": {
+    "model_info": {
+      "id": 856,
+      "model": "pos.bus.mixin",
+      "name": "Bus Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "bus.listener.mixin": {
+    "model_info": {
+      "id": 136,
+      "model": "bus.listener.mixin",
+      "name": "Can send messages via bus.bus",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "format.vat.label.mixin": {
+    "model_info": {
+      "id": 87,
+      "model": "format.vat.label.mixin",
+      "name": "Country Specific VAT Label",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.cover_properties.mixin": {
+    "model_info": {
+      "id": 779,
+      "model": "website.cover_properties.mixin",
+      "name": "Cover Properties Website Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_efff": {
+    "model_info": {
+      "id": 576,
+      "model": "account.edi.xml.ubl_efff",
+      "name": "E-FFF (BE)",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "mail.alias.mixin": {
+    "model_info": {
+      "id": 163,
+      "model": "mail.alias.mixin",
+      "name": "Email Aliases Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "mail.alias.mixin.optional": {
+    "model_info": {
+      "id": 162,
+      "model": "mail.alias.mixin.optional",
+      "name": "Email Aliases Mixin (light)",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "hr.expense.approve.duplicate": {
+    "model_info": {
+      "id": 952,
+      "model": "hr.expense.approve.duplicate",
+      "name": "Expense Approve Duplicate",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 4949,
+        "name": "hr.expense.approve.duplicate form",
+        "type": "form",
+        "arch": "<form string=\"Expense Validate Duplicate\">\n                <p>The following approved expenses have similar employee, amount and category than some expenses of this report. Please verify this report does not contain duplicates.</p>\n                <field name=\"expense_ids\" nolabel=\"1\">\n                    <list>\n                        <field name=\"date\" readonly=\"1\"/>\n                        <field name=\"employee_id\" readonly=\"1\" widget=\"many2one_avatar_employee\"/>\n                        <field name=\"product_id\" readonly=\"1\"/>\n                        <field name=\"total_amount\" readonly=\"1\"/>\n                        <field name=\"name\" readonly=\"1\"/>\n                        <field name=\"manager_id\" readonly=\"1\" widget=\"many2one_avatar_user\"/>\n                        <field name=\"approval_date\" readonly=\"1\"/>\n                    </list>\n                </field>\n                <footer>\n                    <button string=\"Refuse\" class=\"btn-primary\" name=\"action_refuse\" type=\"object\" invisible=\"not expense_ids\" data-hotkey=\"q\"/>\n                    <button string=\"Approve\" class=\"btn-secondary\" name=\"action_approve\" type=\"object\" invisible=\"not expense_ids\" data-hotkey=\"w\"/>\n                    <button string=\"Cancel\" class=\"btn-secondary\" special=\"cancel\" data-hotkey=\"x\"/>\n                </footer>\n           </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 1011,
+        "name": "Validate Duplicate Expenses",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{}"
+      }
+    ]
+  },
+  "hr.expense.post.wizard": {
+    "model_info": {
+      "id": 951,
+      "model": "hr.expense.post.wizard",
+      "name": "Expense Posting Wizard",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 4951,
+        "name": "Post Expenses",
+        "type": "form",
+        "arch": "<form>\n                    <group>\n                        <field name=\"employee_journal_id\" string=\"Journal\"/>\n                        <field name=\"accounting_date\" string=\"Accounting date\"/>\n                    </group>\n                    <footer>\n                        <button name=\"action_post_entry\" string=\"Post Expenses\" type=\"object\" class=\"oe_highlight\" data-hotkey=\"q\"/>\n                        <button string=\"Cancel\" class=\"btn-secondary\" special=\"cancel\" data-hotkey=\"x\"/>\n                    </footer>\n                </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "hr.expense.refuse.wizard": {
+    "model_info": {
+      "id": 950,
+      "model": "hr.expense.refuse.wizard",
+      "name": "Expense Refuse Reason Wizard",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 4948,
+        "name": "hr.expense.refuse.wizard.form",
+        "type": "form",
+        "arch": "<form string=\"Expense refuse reason\">\n                <field name=\"expense_ids\" invisible=\"1\"/>\n                <group>\n                    <field string=\"Reason\" name=\"reason\" class=\"w-100\"/>\n                </group>\n                <footer>\n                    <button string=\"Refuse\" name=\"action_refuse\" type=\"object\" class=\"oe_highlight\" data-hotkey=\"q\"/>\n                    <button string=\"Cancel\" class=\"oe_link\" special=\"cancel\" data-hotkey=\"x\"/>\n                </footer>\n           </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 1010,
+        "name": "Refuse Expense",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{'dialog_size': 'medium'}"
+      }
+    ]
+  },
+  "hr.expense.split": {
+    "model_info": {
+      "id": 954,
+      "model": "hr.expense.split",
+      "name": "Expense Split",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "hr.expense.split.wizard": {
+    "model_info": {
+      "id": 953,
+      "model": "hr.expense.split.wizard",
+      "name": "Expense Split Wizard",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 4950,
+        "name": "Expense split",
+        "type": "form",
+        "arch": "<form>\n                    <div class=\"alert alert-warning w-100 d-flex align-items-center gap-1\" invisible=\"split_possible\" role=\"alert\">\n                        <span>The total amount doesn't match the original amount.</span>\n                    </div>\n                    <field name=\"total_amount_currency_original\" invisible=\"1\"/>\n                    <field name=\"expense_id\" invisible=\"1\"/>\n                    <field name=\"expense_split_line_ids\" widget=\"one2many\" context=\"{'default_expense_id': expense_id}\">\n                        <list editable=\"bottom\">\n                            <field name=\"currency_id\" column_invisible=\"True\"/>\n                            <field name=\"expense_id\" column_invisible=\"True\"/>\n                            <field name=\"company_id\" column_invisible=\"True\"/>\n                            <field name=\"product_has_cost\" column_invisible=\"True\"/>\n                            <field name=\"name\"/>\n                            <field name=\"product_id\" context=\"{                                     'default_type': 'service',                                     'default_can_be_expensed': 1,                                     'list_view_ref': 'hr_expense.product_product_expense_tree_view',                                     'form_view_ref': 'hr_expense.product_product_expense_form_view',                                 }\"/>\n                            <field name=\"employee_id\" widget=\"many2one_avatar_user\"/>\n                            <field name=\"tax_ids\" widget=\"many2many_tags\"/>\n                            <field name=\"tax_amount_currency\"/>\n                            <field name=\"analytic_distribution\" widget=\"analytic_distribution\" optional=\"show\" groups=\"analytic.group_analytic_accounting\"/>\n                            <field name=\"total_amount_currency\" force_save=\"1\" readonly=\"product_has_cost\"/>\n                        </list>\n                    </field>\n                    <field name=\"currency_id\" invisible=\"1\"/>\n                    <group class=\"oe_subtotal_footer\" colspan=\"2\" name=\"expense_total\">\n                        <label for=\"total_amount_currency\" invisible=\"split_possible\"/>\n                        <field name=\"total_amount_currency\" nolabel=\"1\" class=\"text-danger\" invisible=\"split_possible\"/>\n                        <field name=\"total_amount_currency\" invisible=\"not split_possible\"/>\n                        <field name=\"total_amount_currency_original\" widget=\"monetary\" string=\"Original Amount\"/>\n                        <field name=\"tax_amount_currency\" widget=\"monetary\" string=\"Taxes\"/>\n                    </group>\n                    <field name=\"split_possible\" invisible=\"1\"/>\n                    <footer>\n                        <button name=\"action_split_expense\" invisible=\"split_possible\" string=\"Split Expense\" type=\"object\" class=\"oe_highlight\" disabled=\"disabled\" data-hotkey=\"q\"/>\n                        <button name=\"action_split_expense\" string=\"Split Expense\" invisible=\"not split_possible\" type=\"object\" class=\"oe_highlight\" data-hotkey=\"q\"/>\n                        <button string=\"Cancel\" class=\"btn-secondary\" special=\"cancel\" data-hotkey=\"x\"/>\n                    </footer>\n                </form>",
+        "priority": 16
+      },
+      {
+        "id": 4986,
+        "name": "hr.expense.split.view.inherit.sale.expense",
+        "type": "form",
+        "arch": "<xpath expr=\"//field[@name='employee_id']\" position=\"after\">\n                <field name=\"can_be_reinvoiced\" column_invisible=\"True\"/>\n                <field name=\"sale_order_id\" force_save=\"1\" readonly=\"not can_be_reinvoiced\"/>\n            </xpath>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "ir.exports": {
+    "model_info": {
+      "id": 37,
+      "model": "ir.exports",
+      "name": "Exports",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "ir.exports.line": {
+    "model_info": {
+      "id": 38,
+      "model": "ir.exports.line",
+      "name": "Exports Line",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.cii": {
+    "model_info": {
+      "id": 570,
+      "model": "account.edi.xml.cii",
+      "name": "Factur-x/XRechnung CII 2.2.0",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "html.field.history.mixin": {
+    "model_info": {
+      "id": 145,
+      "model": "html.field.history.mixin",
+      "name": "Field html History",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_general_ledger_xlsx": {
+    "model_info": {
+      "id": 1217,
+      "model": "report.a_f_r.report_general_ledger_xlsx",
+      "name": "General Ledger XLSL Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "google.gmail.mixin": {
+    "model_info": {
+      "id": 370,
+      "model": "google.gmail.mixin",
+      "name": "Google Gmail Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "hr.mixin": {
+    "model_info": {
+      "id": 690,
+      "model": "hr.mixin",
+      "name": "hr.mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.html.text.processor": {
+    "model_info": {
+      "id": 775,
+      "model": "website.html.text.processor",
+      "name": "HTML Text Processor Abstract Model",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "image.mixin": {
+    "model_info": {
+      "id": 81,
+      "model": "image.mixin",
+      "name": "Image Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_journal_ledger_xlsx": {
+    "model_info": {
+      "id": 1219,
+      "model": "report.a_f_r.report_journal_ledger_xlsx",
+      "name": "Journal Ledger XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "base.language.export": {
+    "model_info": {
+      "id": 121,
+      "model": "base.language.export",
+      "name": "Language Export",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 110,
+        "name": "Export Translations",
+        "type": "form",
+        "arch": "<form string=\"Export Translations\">\n                    <field name=\"name\" invisible=\"1\"/> <!-- The name is needed in the BinaryField component used to download the file -->\n                    <group invisible=\"state != 'choose'\" string=\"Export Settings\">\n                        <field name=\"lang\"/>\n                        <field name=\"format\"/>\n                        <field name=\"export_type\"/>\n                        <field name=\"modules\" widget=\"many2many_tags\" options=\"{'no_create': True}\" invisible=\"export_type == 'model'\"/>\n                        <field name=\"model_id\" options=\"{'no_create': True}\" invisible=\"export_type == 'module'\" required=\"export_type == 'model'\"/>\n                        <field name=\"model_name\" invisible=\"1\"/> <!-- The model_name is needed for the option of the domain -->\n                        <field name=\"domain\" widget=\"domain\" options=\"{'model': 'model_name'}\" invisible=\"export_type == 'module'\"/>\n                    </group>\n                    <div invisible=\"state != 'get'\">\n                        <h2>Export Complete</h2>\n                        <div invisible=\"data\">\n                            <div class=\"mb-2 rounded-2 overflow-hidden d-grid gap-2\">\n                                <div class=\"alert alert-warning m-0 p-1 ps-3\" role=\"alert\">\n                                    <div name=\"error\" style=\"white-space: pre-wrap;\" invisible=\"export_type == 'module'\">\n                                        Model\n                                        <field name=\"model_id\" readonly=\"1\"/>\n                                        does not contain translatable terms.<br/>\n                                    </div>\n                                    <div name=\"error\" style=\"white-space: pre-wrap;\" invisible=\"export_type == 'model'\">\n                                        Modules\n                                        <field name=\"modules\" widget=\"many2many_tags\" readonly=\"1\"/>\n                                        do not contain translatable terms.<br/>\n                                    </div>\n                                </div>\n                            </div>\n                            No file could be exported.\n                        </div>\n                        <div invisible=\"not data\">\n                            <p>Here is the exported translation file: <field name=\"data\" readonly=\"1\" filename=\"name\"/></p>\n                            <p>This file was generated using the universal <strong>Unicode/UTF-8</strong> file encoding, please be sure to view and edit\n                               using the same encoding.</p>\n                            <p>The next step depends on the file format:\n                                <ul>\n                                <li>CSV format: you may edit it directly with your favorite spreadsheet software,\n                                    the rightmost column (value) contains the translations</li>\n                                <li>PO(T) format: you should edit it with a PO editor such as\n                                    <a href=\"http://www.poedit.net/\" target=\"_blank\">POEdit</a>, or your preferred text editor</li>\n                                <li>TGZ format: bundles multiple PO(T) files as a single archive</li>\n                                </ul>\n                            </p>\n                            <p>For more details about translating Odoo in your language, please refer to the\n                                <a href=\"https://github.com/odoo/odoo/wiki/Translations\" target=\"_blank\">documentation</a>.</p>\n                        </div>\n                    </div>\n                    <footer invisible=\"state != 'choose'\">\n                        <button name=\"act_getfile\" data-hotkey=\"q\" string=\"Export\" type=\"object\" class=\"btn-primary\"/>\n                        <button special=\"cancel\" data-hotkey=\"x\" string=\"Cancel\" type=\"object\" class=\"btn-secondary\"/>\n                    </footer>\n                    <footer invisible=\"state != 'get'\">\n                        <button special=\"cancel\" data-hotkey=\"x\" string=\"Close\" type=\"object\" class=\"btn-primary\"/>\n                    </footer>\n                </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 48,
+        "name": "Export Translation",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{}"
+      }
+    ]
+  },
+  "mail.composer.mixin": {
+    "model_info": {
+      "id": 165,
+      "model": "mail.composer.mixin",
+      "name": "Mail Composer Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "mail.render.mixin": {
+    "model_info": {
+      "id": 164,
+      "model": "mail.render.mixin",
+      "name": "Mail Render Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "maintenance.mixin": {
+    "model_info": {
+      "id": 754,
+      "model": "maintenance.mixin",
+      "name": "Maintenance Maintained Item",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "microsoft.outlook.mixin": {
+    "model_info": {
+      "id": 373,
+      "model": "microsoft.outlook.mixin",
+      "name": "Microsoft Outlook Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "date.range.search.mixin": {
+    "model_info": {
+      "id": 976,
+      "model": "date.range.search.mixin",
+      "name": "Mixin class to add a Many2one style period search field",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "ir.module.module.exclusion": {
+    "model_info": {
+      "id": 71,
+      "model": "ir.module.module.exclusion",
+      "name": "Module exclusion",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.multi.mixin": {
+    "model_info": {
+      "id": 782,
+      "model": "website.multi.mixin",
+      "name": "Multi Website Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.published.multi.mixin": {
+    "model_info": {
+      "id": 784,
+      "model": "website.published.multi.mixin",
+      "name": "Multi Website Published Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_open_items_xlsx": {
+    "model_info": {
+      "id": 1221,
+      "model": "report.a_f_r.report_open_items_xlsx",
+      "name": "Open Items XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.report_xlsx.partner_xlsx": {
+    "model_info": {
+      "id": 973,
+      "model": "report.report_xlsx.partner_xlsx",
+      "name": "Partner XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "eh.cron.batch.mixin": {
+    "model_info": {
+      "id": 1237,
+      "model": "eh.cron.batch.mixin",
+      "name": "Per-record savepoint batch helper",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "portal.mixin": {
+    "model_info": {
+      "id": 410,
+      "model": "portal.mixin",
+      "name": "Portal Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "pos.load.mixin": {
+    "model_info": {
+      "id": 855,
+      "model": "pos.load.mixin",
+      "name": "PoS data loading mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "product.catalog.mixin": {
+    "model_info": {
+      "id": 388,
+      "model": "product.catalog.mixin",
+      "name": "Product Catalog Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.product.report_producttemplatelabel2x7": {
+    "model_info": {
+      "id": 401,
+      "model": "report.product.report_producttemplatelabel2x7",
+      "name": "Product Label Report 2x7",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.product.report_producttemplatelabel4x12": {
+    "model_info": {
+      "id": 403,
+      "model": "report.product.report_producttemplatelabel4x12",
+      "name": "Product Label Report 4x12",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.product.report_producttemplatelabel4x12noprice": {
+    "model_info": {
+      "id": 404,
+      "model": "report.product.report_producttemplatelabel4x12noprice",
+      "name": "Product Label Report 4x12 No Price",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.product.report_producttemplatelabel4x7": {
+    "model_info": {
+      "id": 402,
+      "model": "report.product.report_producttemplatelabel4x7",
+      "name": "Product Label Report 4x7",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "stock.replenish.mixin": {
+    "model_info": {
+      "id": 441,
+      "model": "stock.replenish.mixin",
+      "name": "Product Replenish Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "product.template.attribute.exclusion": {
+    "model_info": {
+      "id": 398,
+      "model": "product.template.attribute.exclusion",
+      "name": "Product Template Attribute Exclusion",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "properties.base.definition.mixin": {
+    "model_info": {
+      "id": 76,
+      "model": "properties.base.definition.mixin",
+      "name": "Properties Base Definition Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "purchase.edi.xml.ubl_bis3": {
+    "model_info": {
+      "id": 602,
+      "model": "purchase.edi.xml.ubl_bis3",
+      "name": "Purchase UBL BIS Ordering 3.5",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "ir.qweb.field.text": {
+    "model_info": {
+      "id": 50,
+      "model": "ir.qweb.field.text",
+      "name": "Qweb Field Text",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "rating.parent.mixin": {
+    "model_info": {
+      "id": 634,
+      "model": "rating.parent.mixin",
+      "name": "Rating Parent Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "resource.mixin": {
+    "model_info": {
+      "id": 156,
+      "model": "resource.mixin",
+      "name": "Resource Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "sale.edi.xml.ubl_bis3": {
+    "model_info": {
+      "id": 590,
+      "model": "sale.edi.xml.ubl_bis3",
+      "name": "Sale BIS Ordering 3.5",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_sg": {
+    "model_info": {
+      "id": 578,
+      "model": "account.edi.xml.ubl_sg",
+      "name": "SG BIS Billing 3.0",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_nl": {
+    "model_info": {
+      "id": 575,
+      "model": "account.edi.xml.ubl_nl",
+      "name": "SI-UBL 2.0 (NLCIUS)",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "hr.individual.skill.mixin": {
+    "model_info": {
+      "id": 705,
+      "model": "hr.individual.skill.mixin",
+      "name": "Skill level",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "spreadsheet.mixin": {
+    "model_info": {
+      "id": 507,
+      "model": "spreadsheet.mixin",
+      "name": "Spreadsheet mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.tax.group": {
+    "model_info": {
+      "id": 523,
+      "model": "account.tax.group",
+      "name": "Tax Group",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 966,
+        "name": "account.tax.group.form",
+        "type": "form",
+        "arch": "<form string=\"Account Tax Group\">\n                    <field name=\"company_id\" invisible=\"1\"/>\n                    <sheet>\n                        <group>\n                            <group>\n                                <field name=\"name\"/>\n                                <field name=\"country_id\"/>\n                                <field name=\"company_id\" groups=\"base.group_multi_company\"/>\n                                <field name=\"sequence\"/>\n                                <field name=\"pos_receipt_label\" string=\"Label on PoS Receipts\" groups=\"base.group_no_one\"/>\n                            </group>\n                            <group>\n                                <field name=\"tax_payable_account_id\" domain=\"[('company_ids', '=', company_id)]\"/>\n                                <field name=\"tax_receivable_account_id\" domain=\"[('company_ids', '=', company_id)]\"/>\n                                <field name=\"advance_tax_payment_account_id\" domain=\"[('company_ids', '=', company_id)]\"/>\n                                <field name=\"preceding_subtotal\"/>\n                            </group>\n                        </group>\n                    </sheet>\n                </form>",
+        "priority": 16
+      },
+      {
+        "id": 965,
+        "name": "account.tax.group.list",
+        "type": "list",
+        "arch": "<list string=\"Account Tax Group\" editable=\"bottom\" open_form_view=\"True\">\n                    <field name=\"sequence\" widget=\"handle\"/>\n                    <field name=\"name\"/>\n                    <field name=\"country_id\"/>\n                    <field name=\"company_id\" column_invisible=\"True\"/>\n                    <field name=\"company_id\" groups=\"base.group_multi_company\"/>\n                    <field name=\"country_code\" column_invisible=\"True\"/>\n\n                    <field name=\"tax_payable_account_id\"/>\n                    <field name=\"tax_receivable_account_id\"/>\n                    <field name=\"advance_tax_payment_account_id\"/>\n\n                    <field name=\"preceding_subtotal\" optional=\"hide\"/>\n                </list>",
+        "priority": 16
+      },
+      {
+        "id": 964,
+        "name": "account.tax.group.search.filters",
+        "type": "search",
+        "arch": "<search string=\"Search Group\">\n                    <field name=\"name\"/>\n                    <field name=\"country_id\"/>\n                    <group>\n                        <filter string=\"Country\" name=\"group_by_country\" domain=\"[]\" context=\"{'group_by': 'country_id'}\"/>\n                    </group>\n                </search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 383,
+        "name": "Tax Groups",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      }
+    ]
+  },
+  "account.tax.repartition.line": {
+    "model_info": {
+      "id": 525,
+      "model": "account.tax.repartition.line",
+      "name": "Tax Repartition Line",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 957,
+        "name": "account.tax.repartition.line.list",
+        "type": "list",
+        "arch": "<list editable=\"bottom\" create=\"1\" delete=\"1\">\n                    <field name=\"sequence\" widget=\"handle\"/>\n                    <field name=\"factor_percent\" invisible=\"repartition_type == 'base'\" widget=\"account_tax_repartition_line_factor_percent\"/>\n                    <field name=\"repartition_type\"/>\n                    <field name=\"account_id\" invisible=\"repartition_type == 'base'\" options=\"{'no_create': True}\"/>\n                    <field name=\"tag_ids\" widget=\"many2many_tags\" options=\"{'no_create': True}\" domain=\"tag_ids_domain\"/>\n                    <field name=\"use_in_tax_closing\" optional=\"hidden\" invisible=\"repartition_type == 'base'\"/>\n                    <field name=\"company_id\" column_invisible=\"True\"/>\n                    <field name=\"tag_ids_domain\" column_invisible=\"True\"/>\n                </list>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.tax.report.wizard": {
+    "model_info": {
+      "id": 1033,
+      "model": "account.tax.report.wizard",
+      "name": "Tax Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [
+      {
+        "id": 5227,
+        "name": "Tax Reports",
+        "type": "form",
+        "arch": "<form string=\"Report Options\">\n                <group>\n                    <group>\n                        <field name=\"target_move\" widget=\"radio\"/>\n                        <field name=\"date_from\"/>\n                    </group>\n                    <group>\n                        <field name=\"company_id\" invisible=\"1\"/>\n                        <field name=\"date_to\"/>\n                    </group>\n                </group>\n            <footer>\n                <button name=\"check_report\" string=\"Print\" type=\"object\" default_focus=\"1\" class=\"oe_highlight\" data-hotkey=\"q\"/>\n                <button string=\"Cancel\" class=\"btn btn-secondary\" special=\"cancel\" data-hotkey=\"z\"/>\n            </footer>\n        </form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 1114,
+        "name": "Tax Reports",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{}"
+      }
+    ]
+  },
+  "template.reset.mixin": {
+    "model_info": {
+      "id": 171,
+      "model": "template.reset.mixin",
+      "name": "Template Reset Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_trial_balance_xlsx": {
+    "model_info": {
+      "id": 1223,
+      "model": "report.a_f_r.report_trial_balance_xlsx",
+      "name": "Trial Balance XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_20": {
+    "model_info": {
+      "id": 571,
+      "model": "account.edi.xml.ubl_20",
+      "name": "UBL 2.0",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_21": {
+    "model_info": {
+      "id": 572,
+      "model": "account.edi.xml.ubl_21",
+      "name": "UBL 2.1",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "account.edi.xml.ubl_bis3": {
+    "model_info": {
+      "id": 573,
+      "model": "account.edi.xml.ubl_bis3",
+      "name": "UBL BIS Billing 3.0.12",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "utm.mixin": {
+    "model_info": {
+      "id": 486,
+      "model": "utm.mixin",
+      "name": "UTM Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "utm.source.mixin": {
+    "model_info": {
+      "id": 488,
+      "model": "utm.source.mixin",
+      "name": "UTM Source Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "report.a_f_r.report_vat_report_xlsx": {
+    "model_info": {
+      "id": 1225,
+      "model": "report.a_f_r.report_vat_report_xlsx",
+      "name": "Vat Report XLSX Report",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.page_options.mixin": {
+    "model_info": {
+      "id": 781,
+      "model": "website.page_options.mixin",
+      "name": "Website page/record specific options",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.page_visibility_options.mixin": {
+    "model_info": {
+      "id": 780,
+      "model": "website.page_visibility_options.mixin",
+      "name": "Website page/record specific visibility options",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.published.mixin": {
+    "model_info": {
+      "id": 783,
+      "model": "website.published.mixin",
+      "name": "Website Published Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "website.searchable.mixin": {
+    "model_info": {
+      "id": 785,
+      "model": "website.searchable.mixin",
+      "name": "Website Searchable Mixin",
+      "state": "base"
+    },
+    "fields": [],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "x_hr_resumption": {
+    "model_info": {
+      "id": 1832,
+      "model": "x_hr_resumption",
+      "name": "أمر مباشرة موظف بالدوام",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23132,
+        "name": "x_actual_days",
+        "field_description": "أيام الاستقطاع الفعلية بعد المباشرة",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23236,
+        "name": "x_admin_order_date",
+        "field_description": "تاريخ الأمر الإداري للمباشرة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23234,
+        "name": "x_admin_order_number",
+        "field_description": "رقم الأمر الإداري للمباشرة",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23150,
+        "name": "x_employee_id",
+        "field_description": "الموظف",
+        "ttype": "many2one",
+        "relation": "hr.employee",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23128,
+        "name": "x_leave_id",
+        "field_description": "الإجازة السابقة المقتطعة",
+        "ttype": "many2one",
+        "relation": "hr.leave",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23113,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23134,
+        "name": "x_notes",
+        "field_description": "البيان والملاحظات والأسباب",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23126,
+        "name": "x_order_date",
+        "field_description": "تاريخ صدور الأمر الإداري",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23124,
+        "name": "x_order_number",
+        "field_description": "رقم الأمر الإداري للمباشرة",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23130,
+        "name": "x_original_days",
+        "field_description": "أيام الإجازة الأصلية قبل القطع",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23122,
+        "name": "x_resumption_date",
+        "field_description": "تاريخ المباشرة الفعلي",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23136,
+        "name": "x_state",
+        "field_description": "الحالة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('draft', 'مسودة'), ('confirmed', 'تمت المباشرة وتعديل الإجازة'), ('cancelled', 'ملغي')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5605,
+        "name": "test.search",
+        "type": "search",
+        "arch": "<search>\n    <field name=\"x_name\" string=\"الأمر\"/>\n    <field name=\"x_order_number\" string=\"رقم الأمر\"/>\n    <field name=\"x_employee_id\" string=\"الموظف\"/>\n    <separator/>\n    <filter string=\"مسودة\" name=\"draft\" domain=\"[['x_state', '=', 'draft']]\"/>\n    <filter string=\"تمت المباشرة\" name=\"confirmed\" domain=\"[['x_state', '=', 'confirmed']]\"/>\n</search>",
+        "priority": 16
+      },
+      {
+        "id": 5601,
+        "name": "x_hr_resumption.form",
+        "type": "form",
+        "arch": "<form string=\"أمر مباشرة موظف بالدوام\">\n    <header>\n        <button name=\"1313\" string=\"اعتماد أمر المباشرة وتعديل الإجازة\" type=\"action\" class=\"oe_highlight\" invisible=\"x_state != 'draft'\"/>\n        <button name=\"1311\" string=\"إلغاء أمر المباشرة واستعادة الإجازة السابقة\" type=\"action\" invisible=\"x_state != 'confirmed'\"/>\n        <field name=\"x_state\" widget=\"statusbar\" statusbar_visible=\"draft,confirmed\"/>\n    </header>\n    <sheet>\n        <div class=\"oe_title\">\n            <label for=\"x_name\" string=\"عنوان / رقم أمر المباشرة\"/>\n            <h1>\n                <field name=\"x_name\" placeholder=\"مثال: أمر مباشرة - أحمد حسن - 2026-10-04\" readonly=\"x_state == 'confirmed'\"/>\n            </h1>\n        </div>\n        <group>\n            <group string=\"بيانات الموظف والمباشرة\">\n                <field name=\"x_employee_id\" options=\"{'no_create': True}\" readonly=\"x_state == 'confirmed'\"/>\n                <field name=\"x_resumption_date\" readonly=\"x_state == 'confirmed'\"/>\n                <field name=\"x_order_number\" readonly=\"x_state == 'confirmed'\"/>\n                <field name=\"x_order_date\" readonly=\"x_state == 'confirmed'\"/>\n            </group>\n            <group string=\"الإجازة المتأثرة واحتساب الاستقطاع\">\n                <field name=\"x_leave_id\" domain=\"[('employee_id', '=', x_employee_id), ('state', 'in', ['confirm', 'validate', 'validate1'])]\" options=\"{'no_create': True}\" readonly=\"x_state == 'confirmed'\"/>\n                <field name=\"x_original_days\" readonly=\"1\"/>\n                <field name=\"x_actual_days\" readonly=\"1\" decoration-bf=\"1\" decoration-danger=\"x_actual_days &gt; 0\"/>\n            </group>\n        </group>\n        <group string=\"البي��ن والملاحظات والأسباب\">\n            <field name=\"x_notes\" placeholder=\"أدخل أي ملاحظات أو أسباب لقطع الإجازة أو المباشرة المبكرة...\" nolabel=\"1\" readonly=\"x_state == 'confirmed'\"/>\n        </group>\n    </sheet>\n</form>",
+        "priority": 16
+      },
+      {
+        "id": 5602,
+        "name": "x_hr_resumption.list",
+        "type": "list",
+        "arch": "<list string=\"أوامر المباشرة بالدوام\" decoration-success=\"x_state == 'confirmed'\" decoration-muted=\"x_state == 'cancelled'\">\n    <field name=\"x_name\"/>\n    <field name=\"x_order_number\"/>\n    <field name=\"x_order_date\"/>\n    <field name=\"x_employee_id\"/>\n    <field name=\"x_resumption_date\"/>\n    <field name=\"x_leave_id\"/>\n    <field name=\"x_original_days\"/>\n    <field name=\"x_actual_days\" decoration-bf=\"1\"/>\n    <field name=\"x_state\" widget=\"badge\" decoration-info=\"x_state == 'draft'\" decoration-success=\"x_state == 'confirmed'\" decoration-danger=\"x_state == 'cancelled'\"/>\n</list>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1311,
+        "name": "Work Resumption: Cancel and Restore Leave",
+        "state": "code",
+        "code": "\nfor rec in records:\n    if rec.x_leave_id and rec.x_leave_id.x_original_end_date:\n        leave = rec.x_leave_id\n        orig_to = leave.x_original_end_date\n        orig_days = leave.x_original_days or rec.x_original_days\n        \n        dt_to = datetime.datetime.combine(orig_to, datetime.time(12, 0, 0))\n        updates = {\n            'request_date_to': orig_to,\n            'date_to': dt_to,\n            'number_of_days': orig_days,\n            'x_is_resumed': False,\n            'x_resumption_date': False,\n            'x_resumption_order_no': False,\n            'x_resumption_id': False\n        }\n        if leave.state == 'refuse':\n            updates['state'] = 'validate'\n            \n        leave.with_context(tracking_disable=True).write(updates)\n        leave.message_post(body=\"تم إلغاء أمر المباشرة بالدوام وإعادة الإجازة إلى مدتها الأصلية (%s يوم) تنتهي بتاريخ %s.\" % (orig_days, orig_to))\n        \n    rec.write({\n        'x_state': 'cancelled',\n        'x_actual_days': 0.0\n    })\n    \n    # Run sync action to recalculate resumption status\n    try:\n        env['ir.actions.server'].browse(1361).run()\n    except Exception:\n        pass\n        \n    if rec.x_employee_id and rec.x_resumption_date:\n        res_date_str = str(rec.x_resumption_date)\n        slips = env['hr.payslip'].search([\n            ('employee_id', '=', rec.x_employee_id.id),\n            ('state', '=', 'draft'),\n            ('date_from', '<=', res_date_str),\n            ('date_to', '>=', res_date_str)\n        ])\n        if slips:\n            action_1307 = env['ir.actions.server'].browse(1307)\n            if action_1307:\n                action_1307.with_context(active_ids=slips.ids, active_model='hr.payslip').run()\n"
+      },
+      {
+        "id": 1313,
+        "name": "Work Resumption: Confirm and Apply",
+        "state": "code",
+        "code": "\nfor rec in records:\n    if not rec.x_employee_id or not rec.x_resumption_date:\n        continue\n    \n    emp = rec.x_employee_id\n    res_date = rec.x_resumption_date\n    if isinstance(res_date, str):\n        res_date = datetime.date.fromisoformat(res_date)\n        \n    res_date_str = str(res_date)\n    \n    auto_name = rec.x_name\n    if not auto_name or auto_name in ['Name', 'جديد', 'New']:\n        auto_name = 'أمر مباشرة - %s - %s' % (emp.name or '', res_date_str)\n        rec.write({'x_name': auto_name})\n        \n    target_leave = rec.x_leave_id\n    if not target_leave:\n        leaves = env['hr.leave'].search([\n            ('employee_id', '=', emp.id),\n            ('state', 'in', ['confirm', 'validate', 'validate1']),\n            ('request_date_from', '<=', res_date_str),\n            ('request_date_to', '>=', res_date_str)\n        ], order='request_date_from desc', limit=1)\n        if leaves:\n            target_leave = leaves[0]\n            rec.write({'x_leave_id': target_leave.id})\n            \n    if target_leave:\n        l_from = target_leave.request_date_from\n        l_to = target_leave.request_date_to\n        if isinstance(l_from, str):\n            l_from = datetime.date.fromisoformat(l_from)\n        if isinstance(l_to, str):\n            l_to = datetime.date.fromisoformat(l_to)\n            \n        orig_days = float(target_leave.number_of_days or 0.0)\n        rec.write({'x_original_days': orig_days})\n        \n        leave_updates = {\n            'x_original_end_date': l_to,\n            'x_original_days': orig_days,\n            'x_is_resumed': True,\n            'x_pending_resumption': False,\n            'x_resumption_warning': False,\n            'x_resumption_date': res_date,\n            'x_resumption_order_no': rec.x_order_number or '',\n            'x_resumption_order_date': rec.x_order_date or False,\n            'x_resumption_id': rec.id\n        }\n        \n        if res_date <= l_from:\n            leave_updates.update({\n                'number_of_days': 0.0,\n                'state': 'refuse'\n            })\n            target_leave.with_context(tracking_disable=True).write(leave_updates)\n            rec.write({\n                'x_actual_days': 0.0,\n                'x_state': 'confirmed'\n            })\n            actual_days = 0.0\n        elif res_date > l_to:\n            # Resumption is after the leave already ended naturally\n            target_leave.with_context(tracking_disable=True).write(leave_updates)\n            rec.write({\n                'x_actual_days': orig_days,\n                'x_state': 'confirmed'\n            })\n            actual_days = orig_days\n        else:\n            new_end_date = res_date - datetime.timedelta(days=1)\n            actual_days = float((new_end_date - l_from).days + 1)\n            dt_to = datetime.datetime.combine(new_end_date, datetime.time(12, 0, 0))\n            \n            leave_updates.update({\n                'request_date_to': new_end_date,\n                'date_to': dt_to,\n                'number_of_days': actual_days\n            })\n            target_leave.with_context(tracking_disable=True).write(leave_updates)\n            rec.write({\n                'x_actual_days': actual_days,\n                'x_state': 'confirmed'\n            })\n            \n        order_str = ('رقم (%s)' % rec.x_order_number) if rec.x_order_number else 'بدون رقم'\n        if rec.x_order_date:\n            order_str += (' في %s' % rec.x_order_date)\n        msg = \"تم إصدار أمر مباشرة بالدوام للموظف بتاريخ %s بموجب الأمر الإداري %s. تمت مباشرة الموظف واعتماد الإجازة.\" % (\n            res_date_str,\n            order_str\n        )\n        target_leave.message_post(body=msg)\n    else:\n        rec.write({\n            'x_state': 'confirmed',\n            'x_actual_days': 0.0\n        })\n        \n    # Clear pending resumption warnings on employee\n    emp.write({\n        'x_pending_resumption': False,\n        'x_resumption_status': 'resumed',\n        'x_resumption_warning': False\n    })\n    \n    slips = env['hr.payslip'].search([\n        ('employee_id', '=', emp.id),\n        ('state', '=', 'draft'),\n        ('date_from', '<=', res_date_str),\n        ('date_to', '>=', res_date_str)\n    ])\n    if slips:\n        slips.write({\n            'x_pending_resumption': False,\n            'x_resumption_status': 'resumed',\n            'x_resumption_warning': False\n        })\n        action_1307 = env['ir.actions.server'].browse(1307)\n        if action_1307:\n            action_1307.with_context(active_ids=slips.ids, active_model='hr.payslip').run()\n\n    # Auto-register resumption in x_hr_admin_order\n    try:\n        admin_order_obj = env['x_hr_admin_order']\n        order_num = rec.x_admin_order_number or ('مباشرة/%s' % rec.id)\n        existing_order = admin_order_obj.search([('x_order_number', '=', order_num)], limit=1)\n        vals_order = {\n            'x_order_number': order_num,\n            'x_order_date': rec.x_resumption_date or fields.Date.today(),\n            'x_title': 'أمر مباشرة بالدوام للموظف: %s' % (rec.x_employee_id.name or ''),\n            'x_order_type': 'resumption',\n            'x_target_type': 'employee',\n            'x_employee_ids': [(6, 0, [rec.x_employee_id.id])],\n            'x_company_id': rec.x_employee_id.company_id.id if rec.x_employee_id.company_id else False,\n            'x_department_id': rec.x_employee_id.department_id.id if rec.x_employee_id.department_id else False,\n            'x_notes': 'أمر مباشرة بالدوام بعد إجازة. تاريخ المباشرة: %s. بيان: %s' % (rec.x_resumption_date or '', rec.x_notes or ''),\n            'x_state': 'active'\n        }\n        if existing_order:\n            existing_order.write(vals_order)\n        else:\n            admin_order_obj.create(vals_order)\n    except Exception as e:\n        pass\n"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1314,
+        "name": "أوامر المباشرة بالدوام",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{'search_default_filter_confirmed': 0}"
+      }
+    ]
+  },
+  "x_hr_admin_order": {
+    "model_info": {
+      "id": 1834,
+      "model": "x_hr_admin_order",
+      "name": "الأوامر الإدارية",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23254,
+        "name": "x_attachment_ids",
+        "field_description": "المرفقات والأوليات الإضافية (بأعداد مفتوحة)",
+        "ttype": "many2many",
+        "relation": "ir.attachment",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23248,
+        "name": "x_branch_memo_company_id",
+        "field_description": "الفرع الصادرة منه المذكرة",
+        "ttype": "many2one",
+        "relation": "res.company",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23246,
+        "name": "x_branch_memo_date",
+        "field_description": "تاريخ مذكرة الفرع",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23250,
+        "name": "x_branch_memo_department_id",
+        "field_description": "القسم الصادرة منه المذكرة",
+        "ttype": "many2one",
+        "relation": "hr.department",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23280,
+        "name": "x_branch_memo_id",
+        "field_description": "المذكرة الواردة من الفرع / القسم",
+        "ttype": "many2one",
+        "relation": "x_branch_memo",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23244,
+        "name": "x_branch_memo_ref",
+        "field_description": "إشارة ورقم مذكرة الفرع / كتاب الإحالة",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23252,
+        "name": "x_branch_memo_subject",
+        "field_description": "موضوع ومضمون مذكرة الفرع",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23184,
+        "name": "x_company_id",
+        "field_description": "الفرع / الشركة",
+        "ttype": "many2one",
+        "relation": "res.company",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23388,
+        "name": "x_deduction_end_date",
+        "field_description": "موعد آخر دفعة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23390,
+        "name": "x_deduction_last_amount",
+        "field_description": "قيمة الدفعة الأخيرة (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23382,
+        "name": "x_deduction_monthly",
+        "field_description": "قيمة الاستقطاع الشهري (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23386,
+        "name": "x_deduction_months",
+        "field_description": "عدد أشهر الاستقطاع",
+        "ttype": "integer",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23384,
+        "name": "x_deduction_start_date",
+        "field_description": "تاريخ بدء الاستقطاع",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23186,
+        "name": "x_department_id",
+        "field_description": "القسم / الإدارة المعنية",
+        "ttype": "many2one",
+        "relation": "hr.department",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23192,
+        "name": "x_document",
+        "field_description": "ملف الأمر الإداري (PDF أو صورة)",
+        "ttype": "binary",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23194,
+        "name": "x_document_filename",
+        "field_description": "اسم ملف الأمر الإداري",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23188,
+        "name": "x_employee_ids",
+        "field_description": "الموظفون المشمولون بالأمر الإداري",
+        "ttype": "many2many",
+        "relation": "hr.employee",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23166,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23190,
+        "name": "x_notes",
+        "field_description": "البيان والشرح والملاحظات",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23238,
+        "name": "x_ocr_status",
+        "field_description": "حالة قراءة الـ OCR",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('none', 'بانتظار المستند'), ('pending', 'قيد القراءة والاستخراج... ⏳'), ('done', 'تمت القراءة وتوليد الخلاصة بنجاح ✅'), ('error', 'تعذرت القراءة ⚠️')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23196,
+        "name": "x_ocr_text",
+        "field_description": "النص المقروء بالـ OCR والبحث الشامل",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23178,
+        "name": "x_order_date",
+        "field_description": "تاريخ صدور الأمر الإداري",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23174,
+        "name": "x_order_number",
+        "field_description": "رقم الأمر الإداري",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23180,
+        "name": "x_order_type",
+        "field_description": "نوع الأمر الإداري",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('appointment', 'أمر تعيين'), ('promotion', 'علاوة / ترفيع وظيفي / تعديل راتب'), ('transfer', 'نقل / تكليف / تغيير موقع أو عنوان وظيفي'), ('penalty', 'عقوبة / إنذار / لفت نظر / توبيخ'), ('thanks', 'كتاب شكر وتقدير / مكافأة'), ('committee', 'تشكيل لجان ومحاضر إدارية'), ('leave', 'أمر منح إجازة (موديول الإجازات)'), ('resumption', 'أمر مباشرة بالدوام (موديول الإجازات)'), ('termination', 'أمر إنهاء خدمة / استقالة'), ('administrative', 'أمر إداري عام / تنظيم عمل وتعاميم'), ('other', 'أوامر إدارية متنوعة')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23380,
+        "name": "x_penalty_amount",
+        "field_description": "قيمة الغرامة الإجمالية (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23198,
+        "name": "x_state",
+        "field_description": "الحالة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('draft', 'مسودة'), ('active', 'نافذ ومعتمد'), ('cancelled', 'ملغي')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23182,
+        "name": "x_target_type",
+        "field_description": "نطاق الشمول",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('employee', 'موظفون محددون'), ('branch', 'الفرع / الشركة بالكامل'), ('all', 'عام لكافة الفروع والموظفين')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23176,
+        "name": "x_title",
+        "field_description": "عنوان / موضوع الأمر الإداري",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5606,
+        "name": "x_hr_admin_order.form",
+        "type": "form",
+        "arch": "<form string=\"الأمر الإداري\">\n    <header>\n        <button name=\"1318\" string=\"اعتماد ونفاذ الأمر الإداري\" type=\"action\" class=\"oe_highlight\" invisible=\"x_state == 'active'\"/>\n        <button name=\"1339\" string=\"⚡ قراءة المستند وتوليد الخلاصة (OCR)\" type=\"action\" invisible=\"not x_document\" class=\"btn-secondary\"/>\n        <button name=\"1319\" string=\"إلغاء الأمر الإداري\" type=\"action\" invisible=\"x_state != 'active'\"/>\n        <button name=\"1320\" string=\"إعادة إلى مسودة\" type=\"action\" invisible=\"x_state == 'draft'\"/>\n        <field name=\"x_state\" widget=\"statusbar\" statusbar_visible=\"draft,active\"/>\n    </header>\n    <sheet>\n        <div class=\"oe_title\">\n            <label for=\"x_name\" string=\"الأمر الإداري\"/>\n            <h1>\n                <field name=\"x_name\" readonly=\"1\"/>\n            </h1>\n        </div>\n\n        <!-- سطر ربط مذكرات الفروع والأقسام تحت اسم الأمر الإداري مباشرة -->\n        <div class=\"alert alert-info py-2 px-3 mb-2 d-flex align-items-center\" role=\"alert\" style=\"background-color: #f0f7ff; border-right: 4px solid #1b365d; border-radius: 4px;\">\n            <strong style=\"color: #1b365d; font-size: 13px;\">📑 مذكرات وكتب الإحالة الواردة من الفروع والأقسام (الأوليات والمرفقات)</strong>\n        </div>\n\n        <group string=\"ربط مذكرة الفرع / القسم المحال بموجبها الأمر الإداري\">\n            <group>\n                <field name=\"x_branch_memo_id\" options=\"{'no_create_edit': False}\" placeholder=\"اختر المذكرة المسجلة أو أنشئ مذكرة فرع جديدة...\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_branch_memo_company_id\" options=\"{'no_create': True}\" placeholder=\"الفرع الصادرة منه المذكرة...\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_branch_memo_department_id\" options=\"{'no_create': True}\" placeholder=\"القسم الصادرة منه المذكرة...\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_branch_memo_subject\" string=\"موضوع كتاب الإحالة / مذكرة الفرع\" placeholder=\"موضوع أو مبررات طلب الفرع...\" readonly=\"x_state == 'active'\"/>\n            </group>\n            <group>\n                <field name=\"x_branch_memo_ref\" placeholder=\"مثال: م/2026/452 أو ك/78\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_branch_memo_date\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_attachment_ids\" widget=\"many2many_binary\" string=\"المرفقات والأوليات (بأعداد مفتوحة)\" readonly=\"x_state == 'active'\"/>\n            </group>\n        </group>\n\n        <group>\n            <group string=\"بيانات صدور الأمر الإداري وتاريخه\">\n                <field name=\"x_order_number\" placeholder=\"مثال: أ/إ/2026/105\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_order_date\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_order_type\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_title\" string=\"موضوع الأمر الإداري\" placeholder=\"مثال: استقطاع مبلغ...\" readonly=\"x_state == 'active'\"/>\n            </group>\n            <group string=\"نطاق الشمول والجهة الموجه إليها\">\n                <field name=\"x_target_type\" widget=\"radio\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_company_id\" options=\"{'no_create': True}\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_department_id\" options=\"{'no_create': True}\" readonly=\"x_state == 'active'\"/>\n            </group>\n        </group>\n\n        <!-- تفاصيل الغرامة والاستقطاع المالي (الرواتب) -->\n        <group string=\"💰 تفاصيل الغرامة والاستقطاع المالي (الرواتب)\">\n            <group>\n                <field name=\"x_penalty_amount\" string=\"قيمة الغرامة الإجمالية (د.ع)\" placeholder=\"مثال: 2000000\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_deduction_monthly\" string=\"قيمة الاستقطاع الشهري (د.ع)\" placeholder=\"مثال: 300000\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_deduction_last_amount\" string=\"قيمة الدفعة الأخيرة (د.ع)\" placeholder=\"تُحسب تلقائياً...\" readonly=\"x_state == 'active'\"/>\n            </group>\n            <group>\n                <field name=\"x_deduction_start_date\" string=\"تاريخ بدء الاستقطاع\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_deduction_months\" string=\"عدد أشهر الاستقطاع\" readonly=\"x_state == 'active'\"/>\n                <field name=\"x_deduction_end_date\" string=\"موعد آخر دفعة\" readonly=\"x_state == 'active'\"/>\n            </group>\n        </group>\n\n        <notebook>\n            <page string=\"مستند الأمر والـ OCR والخلاصة\" name=\"document_ocr\">\n                <group>\n                    <group string=\"المستند المرفق\">\n                        <field name=\"x_document\" widget=\"binary\" filename=\"x_document_filename\"/>\n                        <field name=\"x_document_filename\" invisible=\"1\"/>\n                    </group>\n                    <group string=\"حالة المعالجة الذكية\">\n                        <field name=\"x_ocr_status\" widget=\"badge\" decoration-info=\"x_ocr_status == 'pending'\" decoration-success=\"x_ocr_status == 'done'\" decoration-danger=\"x_ocr_status == 'error'\"/>\n                    </group>\n                </group>\n                <group string=\"خلاصة الأمر الإداري المستخرجة آلياً\">\n                    <field name=\"x_notes\" placeholder=\"سيتم استخراج وتوليد خلاصة الأمر الإداري آلياً هنا بواسطة الـ OCR بمجرد إرفاق المستند...\" nolabel=\"1\"/>\n                </group>\n                <group string=\"النص الكامل للأمر الإداري المستخرج (OCR) للبحث الشامل\">\n                    <field name=\"x_ocr_text\" placeholder=\"النص الكامل المقروء آلياً من الأمر الإداري للبحث السريع عن أي كلمة...\" nolabel=\"1\"/>\n                </group>\n            </page>\n\n            <page string=\"الموظفون المشمولون بالأمر الإداري\" name=\"employees\" invisible=\"x_target_type == 'branch' or x_target_type == 'all'\">\n                <field name=\"x_employee_ids\" readonly=\"x_state == 'active'\">\n                    <list string=\"الموظفون المشمولون\">\n                        <field name=\"name\" string=\"اسم الموظف\"/>\n                        <field name=\"department_id\" string=\"القسم\"/>\n                        <field name=\"job_title\" string=\"المسمى الوظيفي\"/>\n                        <field name=\"company_id\" string=\"الفرع\"/>\n                    </list>\n                </field>\n            </page>\n\n            <page string=\"المرفقات والأوليات الإضافية (بأعداد مفتوحة)\" name=\"additional_attachments\">\n                <group string=\"المرفقات والأوليات ومذكرات الفروع المرفوعة (غير محدودة العدد)\">\n                    <field name=\"x_attachment_ids\" widget=\"many2many_binary\" nolabel=\"1\" readonly=\"x_state == 'active'\"/>\n                </group>\n            </page>\n        </notebook>\n    </sheet>\n</form>",
+        "priority": 16
+      },
+      {
+        "id": 5607,
+        "name": "x_hr_admin_order.list",
+        "type": "list",
+        "arch": "<list string=\"الأوامر الإدارية\" decoration-success=\"x_state == 'active'\" decoration-muted=\"x_state == 'cancelled'\">\n    <field name=\"x_order_number\" string=\"رقم الأمر\"/>\n    <field name=\"x_order_date\" string=\"تاريخ الأمر\"/>\n    <field name=\"x_title\" string=\"الموضوع / العنوان\"/>\n    <field name=\"x_penalty_amount\" string=\"قيمة الغرامة\" optional=\"show\"/>\n    <field name=\"x_deduction_monthly\" string=\"الاستقطاع الشهري\" optional=\"show\"/>\n    <field name=\"x_deduction_months\" string=\"عدد الأشهر\" optional=\"show\"/>\n    <field name=\"x_deduction_last_amount\" string=\"الدفعة الأخيرة\" optional=\"show\"/>\n    <field name=\"x_deduction_start_date\" string=\"تاريخ البدء\" optional=\"hide\"/>\n    <field name=\"x_deduction_end_date\" string=\"موعد آخر دفعة\" optional=\"show\"/>\n    <field name=\"x_branch_memo_ref\" string=\"مذكرة الفرع\" optional=\"show\"/>\n    <field name=\"x_branch_memo_company_id\" string=\"الفرع المصدر للمذكرة\" optional=\"hide\"/>\n    <field name=\"x_order_type\" string=\"نوع الأمر\" widget=\"badge\"/>\n    <field name=\"x_company_id\" string=\"الفرع الموجه إليه\"/>\n    <field name=\"x_employee_ids\" string=\"الموظفون المشمولون\" widget=\"many2many_tags\"/>\n    <field name=\"x_state\" string=\"الحالة\" widget=\"badge\" decoration-info=\"x_state == 'draft'\" decoration-success=\"x_state == 'active'\" decoration-danger=\"x_state == 'cancelled'\"/>\n</list>",
+        "priority": 16
+      },
+      {
+        "id": 5610,
+        "name": "x_hr_admin_order.search",
+        "type": "search",
+        "arch": "<search>\n    <field name=\"x_order_number\" string=\"رقم الأمر\"/>\n    <field name=\"x_title\" string=\"العنوان والموضوع\"/>\n    <field name=\"x_branch_memo_ref\" string=\"رقم مذكرة الفرع\"/>\n    <field name=\"x_branch_memo_subject\" string=\"موضوع مذكرة الفرع\"/>\n    <field name=\"x_employee_ids\" string=\"اسم الموظف\"/>\n    <field name=\"x_order_date\" string=\"تاريخ الأمر\"/>\n    <field name=\"x_company_id\" string=\"الفرع الموجه إليه\"/>\n    <field name=\"x_branch_memo_company_id\" string=\"الفرع المصدر للمذكرة\"/>\n    <field name=\"x_ocr_text\" string=\"محتوى ونص الأمر (OCR)\"/>\n    <field name=\"x_notes\" string=\"الملاحظات\"/>\n    <separator/>\n    <filter string=\"نافذ ومعتمد\" name=\"active\" domain=\"[['x_state', '=', 'active']]\"/>\n    <filter string=\"مسودة\" name=\"draft\" domain=\"[['x_state', '=', 'draft']]\"/>\n    <separator/>\n    <filter string=\"أوامر التعيين\" name=\"type_appoint\" domain=\"[['x_order_type', '=', 'appointment']]\"/>\n    <filter string=\"العلاوات والترقيات\" name=\"type_promo\" domain=\"[['x_order_type', '=', 'promotion']]\"/>\n    <filter string=\"أوامر الإجازات والمباشرة\" name=\"type_leave_resump\" domain=\"[['x_order_type', 'in', ['leave', 'resumption']]]\"/>\n    <filter string=\"إنهاء الخدمة والاستقالة\" name=\"type_term\" domain=\"[['x_order_type', '=', 'termination']]\"/>\n    <filter string=\"العقوبات والإنذارات\" name=\"type_penalty\" domain=\"[['x_order_type', '=', 'penalty']]\"/>\n    <filter string=\"كتب الشكر والتقدير\" name=\"type_thanks\" domain=\"[['x_order_type', '=', 'thanks']]\"/>\n    <filter string=\"أوامر النقل والتكليف\" name=\"type_transfer\" domain=\"[['x_order_type', '=', 'transfer']]\"/>\n    <filter string=\"اللجان والمحاضر الإدارية\" name=\"type_comm\" domain=\"[['x_order_type', '=', 'committee']]\"/>\n    <filter string=\"الأوامر العامة والتعاميم\" name=\"type_admin\" domain=\"[['x_order_type', 'in', ['administrative', 'other']]]\"/>\n</search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1315,
+        "name": "Admin Order: Auto Name and Sync Employees",
+        "state": "code",
+        "code": "\nfor rec in records:\n    name_str = 'أمر إداري رقم %s - %s' % (rec.x_order_number or '', rec.x_title or '')\n    if rec.x_order_date:\n        name_str += ' (%s)' % rec.x_order_date\n    rec.write({'x_name': name_str})\n    \n    # Sync with employee admin orders\n    if rec.x_employee_ids:\n        for emp in rec.x_employee_ids:\n            if rec.id not in emp.x_admin_order_ids.ids:\n                emp.sudo().write({'x_admin_order_ids': [(4, rec.id)]})\n"
+      },
+      {
+        "id": 1319,
+        "name": "Admin Order: Cancel",
+        "state": "code",
+        "code": "\nfor rec in records:\n    rec.write({'x_state': 'cancelled'})\n"
+      },
+      {
+        "id": 1318,
+        "name": "Admin Order: Confirm and Activate",
+        "state": "code",
+        "code": "\nfor rec in records:\n    name_str = 'أمر إداري رقم %s - %s' % (rec.x_order_number or '', rec.x_title or '')\n    if rec.x_order_date:\n        name_str += ' (%s)' % rec.x_order_date\n        \n    order_vals = {\n        'x_name': name_str,\n        'x_state': 'active'\n    }\n    \n    # Calculate deduction schedule if penalty fields are present\n    tot_amt = rec.x_penalty_amount or 0.0\n    mon_amt = rec.x_deduction_monthly or 0.0\n    st_date = rec.x_deduction_start_date or rec.x_order_date or False\n    \n    # Fallback to regex if not filled\n    if mon_amt <= 0:\n        txt = (rec.x_ocr_text or '') + ' ' + (rec.x_notes or '')\n        m_inst = re.search(r'أقساط شهرية مقدارها \\(?([0-9,]+)\\)?|استقطاع.*مقدارها \\(?([0-9,]+)\\)?', txt)\n        if m_inst:\n            val_str = m_inst.group(1) or m_inst.group(2)\n            mon_amt = float(val_str.replace(',', ''))\n        m_tot = re.search(r'البالغة \\(?([0-9,]+)\\)?|بقيمة \\(?([0-9,]+)\\\\)?', txt)\n        if m_tot:\n            val_str = m_tot.group(1) or m_tot.group(2)\n            tot_amt = float(val_str.replace(',', ''))\n            \n    months_cnt = rec.x_deduction_months or 0\n    last_amt = rec.x_deduction_last_amount or 0.0\n    end_dt = rec.x_deduction_end_date or False\n    \n    if mon_amt > 0 and tot_amt > 0:\n        if not months_cnt:\n            months_cnt = int(tot_amt // mon_amt) + (1 if (tot_amt % mon_amt) > 0 else 0)\n            order_vals['x_deduction_months'] = months_cnt\n        if not last_amt:\n            rem = tot_amt % mon_amt\n            last_amt = rem if rem > 0 else mon_amt\n            order_vals['x_deduction_last_amount'] = last_amt\n        if not end_dt and st_date:\n            try:\n                parts = [int(p) for p in str(st_date).replace('/', '-').split('-')]\n                if len(parts) == 3:\n                    s_y, s_m, s_d = parts[0], parts[1], parts[2]\n                    tot_m = s_m + (months_cnt - 1)\n                    end_y = s_y + (tot_m - 1) // 12\n                    end_m = (tot_m - 1) % 12 + 1\n                    end_dt = '%04d-%02d-01' % (end_y, end_m)\n                    order_vals['x_deduction_end_date'] = end_dt\n            except Exception:\n                pass\n                \n    rec.write(order_vals)\n    \n    # Sync with employees\n    if rec.x_employee_ids:\n        for emp in rec.x_employee_ids:\n            if rec.id not in emp.x_admin_order_ids.ids:\n                emp.sudo().write({'x_admin_order_ids': [(4, rec.id)]})\n                \n            if mon_amt > 0:\n                emp_vals = {\n                    'x_ded_other': mon_amt,\n                }\n                if months_cnt:\n                    emp_vals['x_penalty_months'] = months_cnt\n                if last_amt:\n                    emp_vals['x_penalty_last_amount'] = last_amt\n                if end_dt:\n                    emp_vals['x_penalty_end_date'] = end_dt\n                    \n                tot_wage = emp.x_total_wage or emp.x_original_wage or emp.wage or 0.0\n                emp_vals['x_total_wage'] = tot_wage\n                other_deds = (emp.x_ded_social_sec or 0.0) + (emp.x_ded_leaves or 0.0) + (emp.x_ded_delay or 0.0) + (emp.x_ded_advance or 0.0)\n                emp_vals['x_net_wage'] = max(0.0, tot_wage - (other_deds + mon_amt))\n                \n                note_msg = 'استقطاع غرامة (%.0f د.ع شهرياً) بموجب أمر إداري رقم %s' % (mon_amt, rec.x_order_number or '')\n                if tot_amt > 0:\n                    note_msg += ': الإجمالي (%.0f د.ع)' % tot_amt\n                if months_cnt:\n                    note_msg += ' على %d أشهر' % months_cnt\n                if st_date:\n                    note_msg += ' تبدأ من %s' % st_date\n                if end_dt:\n                    note_msg += ' حتى آخر دفعة بتاريخ %s' % end_dt\n                if last_amt and last_amt != mon_amt:\n                    note_msg += ' بقيمة (%.0f د.ع)' % last_amt\n                note_msg += ' لحين استيفاء كامل المبلغ'\n                \n                curr_notes = emp.x_payroll_notes or ''\n                if note_msg not in curr_notes:\n                    emp_vals['x_payroll_notes'] = (curr_notes + ' | ' + note_msg) if curr_notes else note_msg\n                emp.sudo().write(emp_vals)\n"
+      },
+      {
+        "id": 1339,
+        "name": "Admin Order: Request OCR",
+        "state": "code",
+        "code": "for rec in records:\n    rec.write({'x_ocr_status': 'pending'})\n    env.cr.commit()\n    for _ in range(12):\n        time.sleep(1)\n        env.cr.commit()\n        rec.invalidate_recordset()\n        if rec.x_ocr_status in ('done', 'error'):\n            break\n\naction = {'type': 'ir.actions.client', 'tag': 'reload'}\n"
+      },
+      {
+        "id": 1320,
+        "name": "Admin Order: Set to Draft",
+        "state": "code",
+        "code": "\nfor rec in records:\n    rec.write({'x_state': 'draft'})\n"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1336,
+        "name": "أوامر إنهاء الخدمة والاستقالة",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1335,
+        "name": "أوامر الإجازات والمباشرة بالدوام",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1328,
+        "name": "أوامر التعيين",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1332,
+        "name": "أوامر النقل والتكليف",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1321,
+        "name": "الأوامر الإدارية",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{'search_default_active_orders': 0}"
+      },
+      {
+        "id": 1334,
+        "name": "التعاميم والأوامر العامة",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1330,
+        "name": "العقوبات والإنذارات",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1329,
+        "name": "العلاوات والترقيات وتعديل الرواتب",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1333,
+        "name": "اللجان والمحاضر الإدارية",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1327,
+        "name": "كافة الأوامر الإدارية",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      },
+      {
+        "id": 1331,
+        "name": "كتب الشكر والتقدير والمكافآت",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      }
+    ]
+  },
+  "x_letter_of_credit": {
+    "model_info": {
+      "id": 1842,
+      "model": "x_letter_of_credit",
+      "name": "الاعتمادات المستندية",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23472,
+        "name": "x_asset_ids",
+        "field_description": "المعدات / الأصول الثابتة المرتبطة",
+        "ttype": "many2many",
+        "relation": "account.asset.asset",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23478,
+        "name": "x_attachment_ids",
+        "field_description": "المرفقات وبوالص الشحن",
+        "ttype": "many2many",
+        "relation": "ir.attachment",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23460,
+        "name": "x_clearing_account_id",
+        "field_description": "حساب اعتمادات قيد التنفيذ",
+        "ttype": "many2one",
+        "relation": "account.account",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23464,
+        "name": "x_commission_account_id",
+        "field_description": "حساب عمولات الاعتمادات",
+        "ttype": "many2one",
+        "relation": "account.account",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23424,
+        "name": "x_company_id",
+        "field_description": "الشركة / الفرع",
+        "ttype": "many2one",
+        "relation": "res.company",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23430,
+        "name": "x_correspondent_bank",
+        "field_description": "المصرف المراسل",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23438,
+        "name": "x_currency_id",
+        "field_description": "عملة الاعتماد",
+        "ttype": "many2one",
+        "relation": "res.currency",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23474,
+        "name": "x_document",
+        "field_description": "مستند الاعتماد (PDF/صورة)",
+        "ttype": "binary",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23476,
+        "name": "x_document_filename",
+        "field_description": "اسم الملف",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23442,
+        "name": "x_exchange_rate",
+        "field_description": "سعر الصرف (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23498,
+        "name": "x_expense_line_ids",
+        "field_description": "تفاصيل العمولات والمصاريف",
+        "ttype": "one2many",
+        "relation": "x_lc_expense_line",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23436,
+        "name": "x_expiry_date",
+        "field_description": "تاريخ انتهاء الاعتماد",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23462,
+        "name": "x_facility_account_id",
+        "field_description": "حساب التسهيلات المصرفية",
+        "ttype": "many2one",
+        "relation": "account.account",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23452,
+        "name": "x_facility_amount",
+        "field_description": "مبلغ التسهيلات المصرفية (بالعملة)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    if rec.x_financing_type == 'margin':\n        rec['x_facility_amount'] = 0.0\n    else:\n        rec['x_facility_amount'] = max(0.0, (rec.x_lc_amount or 0.0) - (rec.x_margin_amount or 0.0))",
+        "depends": "x_lc_amount, x_margin_amount, x_financing_type",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23454,
+        "name": "x_facility_amount_iqd",
+        "field_description": "مبلغ التسهيلات المصرفية (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    rate = rec.x_exchange_rate or 1.0\n    rec['x_facility_amount_iqd'] = (rec.x_facility_amount or 0.0) * rate",
+        "depends": "x_facility_amount, x_exchange_rate",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23420,
+        "name": "x_financing_type",
+        "field_description": "طريقة التمويل المصرفي",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('margin', 'حجز غطاء نقدي (كلي أو جزئي)'), ('facility', 'تسهيلات مصرفية'), ('mixed', 'حجز غطاء جزئي + تسهيلات مصرفية')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23428,
+        "name": "x_issuing_bank_journal_id",
+        "field_description": "المصرف الفاتح للاعتماد",
+        "ttype": "many2one",
+        "relation": "account.journal",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23456,
+        "name": "x_journal_id",
+        "field_description": "يومية قيود الاعتمادات",
+        "ttype": "many2one",
+        "relation": "account.journal",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23470,
+        "name": "x_landed_cost_ids",
+        "field_description": "التكاليف الإضافية للمخزون",
+        "ttype": "many2many",
+        "relation": "stock.landed.cost",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23434,
+        "name": "x_latest_ship_date",
+        "field_description": "آخر موعد للشحن",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23440,
+        "name": "x_lc_amount",
+        "field_description": "قيمة الاعتماد (بالعملة)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23444,
+        "name": "x_lc_amount_iqd",
+        "field_description": "قيمة الاعتماد (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    rate = rec.x_exchange_rate or 1.0\n    rec['x_lc_amount_iqd'] = (rec.x_lc_amount or 0.0) * rate",
+        "depends": "x_lc_amount, x_exchange_rate",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23414,
+        "name": "x_lc_number",
+        "field_description": "رقم الاعتماد المصرفي",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23416,
+        "name": "x_lc_type",
+        "field_description": "نوع الاعتماد",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('irrevocable', 'غير قابل للنقض (Irrevocable)'), ('confirmed', 'معزز (Confirmed)'), ('sight', 'بالاطلاع (At Sight)'), ('deferred', 'مؤجل الدفع (Deferred)')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23458,
+        "name": "x_margin_account_id",
+        "field_description": "حساب الغطاء النقدي المحجوز",
+        "ttype": "many2one",
+        "relation": "account.account",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23448,
+        "name": "x_margin_amount",
+        "field_description": "مبلغ الغطاء المحجوز (بالعملة)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    if rec.x_financing_type == 'facility':\n        rec['x_margin_amount'] = 0.0\n    else:\n        rec['x_margin_amount'] = (rec.x_lc_amount or 0.0) * ((rec.x_margin_percent or 0.0) / 100.0)",
+        "depends": "x_lc_amount, x_margin_percent, x_financing_type",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23450,
+        "name": "x_margin_amount_iqd",
+        "field_description": "مبلغ الغطاء المحجوز (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    rate = rec.x_exchange_rate or 1.0\n    rec['x_margin_amount_iqd'] = (rec.x_margin_amount or 0.0) * rate",
+        "depends": "x_margin_amount, x_exchange_rate",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23446,
+        "name": "x_margin_percent",
+        "field_description": "نسبة الغطاء المحجوز (%)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23468,
+        "name": "x_move_ids",
+        "field_description": "القيود المحاسبية المرتبطة",
+        "ttype": "many2many",
+        "relation": "account.move",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23398,
+        "name": "x_name",
+        "field_description": "مرجع الاعتماد",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23480,
+        "name": "x_notes",
+        "field_description": "شروط وملاحظات الاعتماد",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23432,
+        "name": "x_open_date",
+        "field_description": "تاريخ فتح الاعتماد",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23426,
+        "name": "x_partner_id",
+        "field_description": "المورد الخارجي (المستفيد)",
+        "ttype": "many2one",
+        "relation": "res.partner",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23466,
+        "name": "x_purchase_order_ids",
+        "field_description": "أوامر الشراء المرتبطة",
+        "ttype": "many2many",
+        "relation": "purchase.order",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23418,
+        "name": "x_purpose",
+        "field_description": "الغرض من الاعتماد",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('inventory', 'استيراد بضائع ومواد مخزنية'), ('asset', 'استيراد معدات وآليات (أصول ثابتة)'), ('mixed', 'مشترك (بضائع ومعدات)')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23422,
+        "name": "x_state",
+        "field_description": "الحالة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('draft', 'مسودة'), ('opened', 'مفتوح / قيد التنفيذ'), ('shipped', 'تم الشحن'), ('settled', 'مسوّى ومغلق'), ('cancelled', 'ملغي')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23500,
+        "name": "x_total_commissions_iqd",
+        "field_description": "إجمالي العمولات والمصاريف (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    rec['x_total_commissions_iqd'] = sum(rec.x_expense_line_ids.mapped('x_amount_iqd'))",
+        "depends": "x_expense_line_ids.x_amount_iqd",
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23502,
+        "name": "x_total_lc_cost_iqd",
+        "field_description": "إجمالي الكلفة الفعلية للاعتماد (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": "for rec in self:\n    rec['x_total_lc_cost_iqd'] = (rec.x_lc_amount_iqd or 0.0) + (rec.x_total_commissions_iqd or 0.0)",
+        "depends": "x_lc_amount_iqd, x_total_commissions_iqd",
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5651,
+        "name": "x_letter_of_credit.form",
+        "type": "form",
+        "arch": "<form string=\"الاعتماد المستندي\">\n    <header>\n        <button name=\"1573\" string=\"فتح الاعتماد وإنشاء القيد المحاسبي\" type=\"action\" class=\"oe_highlight\" invisible=\"x_state != 'draft'\" icon=\"fa-check\"/>\n        <button name=\"1574\" string=\"ترحيل العمولات والمصاريف للمحاسبة\" type=\"action\" class=\"btn-secondary\" invisible=\"x_state == 'draft' or x_state == 'cancelled'\" icon=\"fa-money\"/>\n        <button name=\"1575\" string=\"تأكيد الشحن\" type=\"action\" class=\"btn-info\" invisible=\"x_state != 'opened'\" icon=\"fa-ship\"/>\n        <button name=\"1576\" string=\"تسوية وإغلاق الاعتماد\" type=\"action\" class=\"btn-success\" invisible=\"x_state not in ('opened', 'shipped')\" icon=\"fa-lock\"/>\n        <button name=\"1577\" string=\"إعادة إلى مسودة\" type=\"action\" invisible=\"x_state == 'draft'\"/>\n        <field name=\"x_state\" widget=\"statusbar\" statusbar_visible=\"draft,opened,shipped,settled\"/>\n    </header>\n    <sheet>\n        <div class=\"oe_title\">\n            <label for=\"x_name\" string=\"مرجع الاعتماد المستندي\"/>\n            <h1>\n                <field name=\"x_name\" placeholder=\"مثال: LC/2026/001 - استيراد حفارة / مواد أولية\" readonly=\"x_state != 'draft'\"/>\n            </h1>\n        </div>\n        <group>\n            <group string=\"بيانات الاعتماد الأساسية\">\n                <field name=\"x_lc_number\" placeholder=\"رقم الاعتماد الصادر من المصرف...\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_lc_type\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_purpose\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_financing_type\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_company_id\" options=\"{'no_create': True}\" readonly=\"x_state != 'draft'\"/>\n            </group>\n            <group string=\"الأطراف والمصرف والتواريخ\">\n                <field name=\"x_partner_id\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_issuing_bank_journal_id\" options=\"{'no_create': True}\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_correspondent_bank\" placeholder=\"اسم المصرف المراسل الخارجي...\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_open_date\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_latest_ship_date\"/>\n                <field name=\"x_expiry_date\"/>\n            </group>\n        </group>\n\n        <group>\n            <group string=\"قيمة الاعتماد وسعر الصرف\">\n                <field name=\"x_currency_id\" options=\"{'no_create': True}\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_lc_amount\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_exchange_rate\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_lc_amount_iqd\" readonly=\"1\" style=\"font-weight: bold; color: #1b365d;\"/>\n            </group>\n            <group string=\"تفاصيل الغطاء النقدي والتسهيلات المصرفية\">\n                <field name=\"x_margin_percent\" invisible=\"x_financing_type == 'facility'\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_margin_amount\" invisible=\"x_financing_type == 'facility'\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_margin_amount_iqd\" invisible=\"x_financing_type == 'facility'\" readonly=\"1\"/>\n                <field name=\"x_facility_amount\" invisible=\"x_financing_type == 'margin'\" readonly=\"x_state != 'draft'\"/>\n                <field name=\"x_facility_amount_iqd\" invisible=\"x_financing_type == 'margin'\" readonly=\"1\"/>\n            </group>\n        </group>\n\n        <group string=\"ملخص الكلفة الفعلية للاعتماد\">\n            <group>\n                <field name=\"x_total_commissions_iqd\" readonly=\"1\"/>\n            </group>\n            <group>\n                <field name=\"x_total_lc_cost_iqd\" readonly=\"1\" style=\"font-weight: bold; font-size: 16px; color: #0b5345;\"/>\n            </group>\n        </group>\n\n        <notebook>\n            <page string=\"العمولات والمصاريف التفصيلية\" name=\"expenses\">\n                <field name=\"x_expense_line_ids\">\n                    <list editable=\"bottom\">\n                        <field name=\"x_date\"/>\n                        <field name=\"x_expense_type\"/>\n                        <field name=\"x_description\"/>\n                        <field name=\"x_amount_currency\"/>\n                        <field name=\"x_amount_iqd\" sum=\"الإجمالي (د.ع)\"/>\n                        <field name=\"x_capitalize\"/>\n                        <field name=\"x_move_id\" readonly=\"1\"/>\n                    </list>\n                </field>\n            </page>\n            <page string=\"الربط المحاسبي والتشغيلي\" name=\"accounting_links\">\n                <group>\n                    <group string=\"الحسابات واليومية المعتمدة\">\n                        <field name=\"x_journal_id\" options=\"{'no_create': True}\"/>\n                        <field name=\"x_margin_account_id\" options=\"{'no_create': True}\"/>\n                        <field name=\"x_clearing_account_id\" options=\"{'no_create': True}\"/>\n                        <field name=\"x_facility_account_id\" options=\"{'no_create': True}\"/>\n                        <field name=\"x_commission_account_id\" options=\"{'no_create': True}\"/>\n                    </group>\n                    <group string=\"سجلات المشتريات والمخزون والأصول\">\n                        <field name=\"x_purchase_order_ids\" widget=\"many2many_tags\" string=\"أوامر الشراء المرتبطة\"/>\n                        <field name=\"x_landed_cost_ids\" widget=\"many2many_tags\" string=\"التكاليف الإضافية للمخزون\" invisible=\"x_purpose == 'asset'\"/>\n                        <field name=\"x_asset_ids\" widget=\"many2many_tags\" string=\"الأصول الثابتة / المعدات\" invisible=\"x_purpose == 'inventory'\"/>\n                    </group>\n                </group>\n                <separator string=\"القيود المحاسبية المنشأة تلقائياً\"/>\n                <field name=\"x_move_ids\" readonly=\"1\">\n                    <list>\n                        <field name=\"name\" string=\"رقم القيد\"/>\n                        <field name=\"date\" string=\"التاريخ\"/>\n                        <field name=\"ref\" string=\"المرجع\"/>\n                        <field name=\"amount_total\" string=\"المبلغ\" sum=\"الإجمالي\"/>\n                        <field name=\"state\" string=\"الحالة\" widget=\"badge\"/>\n                    </list>\n                </field>\n            </page>\n            <page string=\"المستندات وبوالص الشحن والملاحظات\" name=\"docs\">\n                <group>\n                    <field name=\"x_document_filename\" invisible=\"1\"/>\n                    <field name=\"x_document\" filename=\"x_document_filename\" widget=\"binary\" string=\"نسخة الاعتماد المصرفي\"/>\n                    <field name=\"x_attachment_ids\" widget=\"many2many_binary\" string=\"بوالص الشحن والفواتير (مرفقات متعددة)\"/>\n                </group>\n                <group string=\"شروط وملاحظات\">\n                    <field name=\"x_notes\" nolabel=\"1\" placeholder=\"شروط الدفع، مواصفات البضاعة/المعدة، ملاحظات التعديل...\"/>\n                </group>\n            </page>\n        </notebook>\n    </sheet>\n</form>",
+        "priority": 16
+      },
+      {
+        "id": 5650,
+        "name": "x_letter_of_credit.list",
+        "type": "list",
+        "arch": "<list string=\"الاعتمادات المستندية\" decoration-info=\"x_state == 'draft'\" decoration-primary=\"x_state == 'opened'\" decoration-warning=\"x_state == 'shipped'\" decoration-success=\"x_state == 'settled'\" decoration-muted=\"x_state == 'cancelled'\">\n    <field name=\"x_name\" string=\"مرجع الاعتماد\"/>\n    <field name=\"x_lc_number\" string=\"رقم الاعتماد المصرفي\"/>\n    <field name=\"x_partner_id\" string=\"المورد / المستفيد\"/>\n    <field name=\"x_purpose\" string=\"الغرض\"/>\n    <field name=\"x_financing_type\" string=\"طريقة التمويل\"/>\n    <field name=\"x_currency_id\" string=\"العملة\"/>\n    <field name=\"x_lc_amount\" string=\"قيمة الاعتماد\"/>\n    <field name=\"x_total_lc_cost_iqd\" string=\"إجمالي الكلفة (د.ع)\" sum=\"الإجمالي\"/>\n    <field name=\"x_open_date\" string=\"تاريخ الفتح\"/>\n    <field name=\"x_expiry_date\" string=\"تاريخ الانتهاء\"/>\n    <field name=\"x_state\" string=\"الحالة\" widget=\"badge\" decoration-info=\"x_state == 'draft'\" decoration-primary=\"x_state == 'opened'\" decoration-warning=\"x_state == 'shipped'\" decoration-success=\"x_state == 'settled'\"/>\n</list>",
+        "priority": 16
+      },
+      {
+        "id": 5652,
+        "name": "x_letter_of_credit.search",
+        "type": "search",
+        "arch": "<search string=\"بحث الاعتمادات المستندية\">\n    <field name=\"x_name\"/>\n    <field name=\"x_lc_number\"/>\n    <field name=\"x_partner_id\"/>\n    <filter string=\"مسودة\" name=\"draft\" domain=\"[('x_state', '=', 'draft')]\"/>\n    <filter string=\"مفتوحة وقيد التنفيذ\" name=\"opened\" domain=\"[('x_state', '=', 'opened')]\"/>\n    <filter string=\"بضائع ومخزون\" name=\"inventory\" domain=\"[('x_purpose', 'in', ('inventory', 'mixed'))]\"/>\n    <filter string=\"معدات وأصول ثابتة\" name=\"asset\" domain=\"[('x_purpose', 'in', ('asset', 'mixed'))]\"/>\n</search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1577,
+        "name": "LC: إعادة إلى مسودة",
+        "state": "code",
+        "code": "records.write({'x_state': 'draft'})"
+      },
+      {
+        "id": 1575,
+        "name": "LC: تأكيد الشحن",
+        "state": "code",
+        "code": "records.write({'x_state': 'shipped'})"
+      },
+      {
+        "id": 1574,
+        "name": "LC: ترحيل العمولات والمصاريف إلى المحاسبة",
+        "state": "code",
+        "code": "\nfor rec in records:\n    unposted = rec.x_expense_line_ids.filtered(lambda l: not l.x_move_id and (l.x_amount_iqd or 0.0) > 0)\n    if not unposted:\n        raise UserError('لا توجد مصاريف أو عمولات غير مرحّلة في هذا الاعتماد.')\n    bank_j = rec.x_issuing_bank_journal_id\n    if not bank_j or not bank_j.default_account_id:\n        raise UserError('يرجى تحديد المصرف الفاتح للاعتماد أولاً لخصم العمولات منه.')\n    journal = rec.x_journal_id or bank_j\n    bank_acc = bank_j.default_account_id\n    lines = []\n    total_exp = 0.0\n    for l in unposted:\n        amt = l.x_amount_iqd or 0.0\n        total_exp += amt\n        target_acc = rec.x_clearing_account_id if l.x_capitalize else rec.x_commission_account_id\n        if not target_acc:\n            raise UserError('يرجى تحديد حساب اعتمادات قيد التنفيذ وحساب العمولات.')\n        lines.append((0, 0, {\n            'account_id': target_acc.id,\n            'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n            'name': (l.x_description or 'مصروف اعتماد مستندي') + ' - ' + (rec.x_name or ''),\n            'debit': amt,\n            'credit': 0.0,\n        }))\n    lines.append((0, 0, {\n        'account_id': bank_acc.id,\n        'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n        'name': 'سداد مصاريف وعمولات اعتماد مستندي: ' + (rec.x_name or ''),\n        'debit': 0.0,\n        'credit': total_exp,\n    }))\n    move = env['account.move'].create({\n        'journal_id': journal.id,\n        'date': datetime.date.today(),\n        'ref': 'عمولات ومصاريف اعتماد - ' + (rec.x_lc_number or rec.x_name or ''),\n        'line_ids': lines,\n    })\n    move.action_post()\n    unposted.write({'x_move_id': move.id})\n    rec.write({'x_move_ids': [(4, move.id)]})\n"
+      },
+      {
+        "id": 1576,
+        "name": "LC: تسوية وإغلاق الاعتماد",
+        "state": "code",
+        "code": "\nfor rec in records:\n    if rec.x_margin_amount_iqd > 0 and rec.x_margin_account_id and rec.x_clearing_account_id:\n        journal = rec.x_journal_id or rec.x_issuing_bank_journal_id\n        if journal:\n            move = env['account.move'].create({\n                'journal_id': journal.id,\n                'date': datetime.date.today(),\n                'ref': 'تسوية وإغلاق اعتماد مستندي - ' + (rec.x_lc_number or rec.x_name or ''),\n                'line_ids': [\n                    (0, 0, {\n                        'account_id': rec.x_clearing_account_id.id,\n                        'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n                        'name': 'إقفال غطاء الاعتماد المستندي: ' + (rec.x_name or ''),\n                        'debit': rec.x_margin_amount_iqd,\n                        'credit': 0.0,\n                    }),\n                    (0, 0, {\n                        'account_id': rec.x_margin_account_id.id,\n                        'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n                        'name': 'تسوية تأمينات الغطاء النقدي: ' + (rec.x_name or ''),\n                        'debit': 0.0,\n                        'credit': rec.x_margin_amount_iqd,\n                    }),\n                ],\n            })\n            move.action_post()\n            rec.write({'x_move_ids': [(4, move.id)]})\n    rec.write({'x_state': 'settled'})\n"
+      },
+      {
+        "id": 1573,
+        "name": "LC: فتح الاعتماد وإنشاء قيد الحجز / التسهيلات",
+        "state": "code",
+        "code": "\nfor rec in records:\n    if rec.x_state != 'draft':\n        continue\n    bank_j = rec.x_issuing_bank_journal_id\n    if not bank_j or not bank_j.default_account_id:\n        raise UserError('يرجى تحديد المصرف الفاتح للاعتماد والتأكد من وجود حساب مصرفي افتراضي له.')\n    journal = rec.x_journal_id or bank_j\n    bank_acc = bank_j.default_account_id\n    lines = []\n    margin_iqd = rec.x_margin_amount_iqd or 0.0\n    facility_iqd = rec.x_facility_amount_iqd or 0.0\n    if margin_iqd > 0 and rec.x_financing_type in ('margin', 'mixed'):\n        if not rec.x_margin_account_id:\n            raise UserError('يرجى تحديد حساب الغطاء النقدي المحجوز.')\n        lines.append((0, 0, {\n            'account_id': rec.x_margin_account_id.id,\n            'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n            'name': 'حجز غطاء اعتماد مستندي: ' + (rec.x_name or ''),\n            'debit': margin_iqd,\n            'credit': 0.0,\n        }))\n        lines.append((0, 0, {\n            'account_id': bank_acc.id,\n            'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n            'name': 'استقطاع غطاء اعتماد مستندي من المصرف: ' + (rec.x_name or ''),\n            'debit': 0.0,\n            'credit': margin_iqd,\n        }))\n    if facility_iqd > 0 and rec.x_financing_type in ('facility', 'mixed'):\n        if not rec.x_clearing_account_id or not rec.x_facility_account_id:\n            raise UserError('يرجى تحديد حساب اعتمادات قيد التنفيذ وحساب التسهيلات المصرفية.')\n        lines.append((0, 0, {\n            'account_id': rec.x_clearing_account_id.id,\n            'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n            'name': 'اعتماد مستندي قيد التنفيذ (تسهيلات): ' + (rec.x_name or ''),\n            'debit': facility_iqd,\n            'credit': 0.0,\n        }))\n        lines.append((0, 0, {\n            'account_id': rec.x_facility_account_id.id,\n            'partner_id': rec.x_partner_id.id if rec.x_partner_id else False,\n            'name': 'التزام تسهيلات مصرفية للاعتماد: ' + (rec.x_name or ''),\n            'debit': 0.0,\n            'credit': facility_iqd,\n        }))\n    if lines:\n        move = env['account.move'].create({\n            'journal_id': journal.id,\n            'date': rec.x_open_date or datetime.date.today(),\n            'ref': 'فتح اعتماد مستندي - ' + (rec.x_lc_number or rec.x_name or ''),\n            'line_ids': lines,\n        })\n        move.action_post()\n        rec.write({\n            'x_state': 'opened',\n            'x_move_ids': [(4, move.id)],\n        })\n    else:\n        rec.write({'x_state': 'opened'})\n"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1578,
+        "name": "الاعتمادات المستندية",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      }
+    ]
+  },
+  "x_hr_holiday_schedule": {
+    "model_info": {
+      "id": 1836,
+      "model": "x_hr_holiday_schedule",
+      "name": "العطل الرسمية والدينية",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23222,
+        "name": "x_company_ids",
+        "field_description": "الفروع والشركات المشمولة",
+        "ttype": "many2many",
+        "relation": "res.company",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23214,
+        "name": "x_date_from",
+        "field_description": "تاريخ بدء العطلة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23216,
+        "name": "x_date_to",
+        "field_description": "تاريخ انتهاء العطلة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23224,
+        "name": "x_department_ids",
+        "field_description": "الأقسام المشمولة بالعطلة",
+        "ttype": "many2many",
+        "relation": "hr.department",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23218,
+        "name": "x_duration_days",
+        "field_description": "عدد أيام العطلة",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23226,
+        "name": "x_employee_ids",
+        "field_description": "الموظفون المشمولون بالعطلة",
+        "ttype": "many2many",
+        "relation": "hr.employee",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23210,
+        "name": "x_holiday_name",
+        "field_description": "اسم / مناسبة العطلة",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23212,
+        "name": "x_holiday_type",
+        "field_description": "نوع العطلة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('religious', 'عطلة دينية'), ('official', 'عطلة رسمية / وطنية'), ('emergency', 'عطلة طارئة / جوية / أمنية'), ('special', 'مناسبة خاصة / أخرى')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23242,
+        "name": "x_leave_ids",
+        "field_description": "إجازات العطلة المتولدة للموظفين",
+        "ttype": "one2many",
+        "relation": "hr.leave",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23202,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23228,
+        "name": "x_notes",
+        "field_description": "البيان وسند العطلة والملاحظات",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23230,
+        "name": "x_paid",
+        "field_description": "عطلة مدفوعة الأجر",
+        "ttype": "boolean",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23232,
+        "name": "x_state",
+        "field_description": "الحالة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('draft', 'مسودة'), ('confirmed', 'معتمدة ونافذة'), ('cancelled', 'ملغية')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23220,
+        "name": "x_target_scope",
+        "field_description": "نطاق الشمول والتطبيق",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('all', 'عام لكافة الفروع والأقسام والموظفين'), ('branch', 'فروع محددة'), ('department', 'أقسام محددة'), ('employee', 'موظفون محددون بالاسم'), ('custom', 'مخصص (فروع وأقسام وموظفين)')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5613,
+        "name": "x_hr_holiday_schedule.form",
+        "type": "form",
+        "arch": "<form string=\"عطلة رسمية / دينية\">\n    <header>\n        <button string=\"اعتماد وتطبيق العطلة (وتوليد إجازات الموظفين)\" type=\"action\" name=\"1322\" invisible=\"x_state == 'confirmed'\" class=\"btn-primary\"/>\n        <button string=\"إعادة للمسودة\" type=\"action\" name=\"1324\" invisible=\"x_state == 'draft'\"/>\n        <button string=\"إلغاء العطلة\" type=\"action\" name=\"1323\" invisible=\"x_state == 'cancelled'\"/>\n        <field name=\"x_state\" widget=\"statusbar\" statusbar_visible=\"draft,confirmed,cancelled\"/>\n    </header>\n    <sheet>\n        <div class=\"oe_title\">\n            <label for=\"x_holiday_name\" string=\"اسم / مناسبة العطلة (يتم تحديدها يدوياً من الإدارة)\"/>\n            <h1><field name=\"x_holiday_name\" placeholder=\"مثال: عطلة عيد الفطر / رأس السنة الهجرية / عطلة عيد الغدير / عطلة طارئة لأمطار...\"/></h1>\n        </div>\n        <group>\n            <group string=\"تفاصيل وتواريخ العطلة\">\n                <field name=\"x_holiday_type\"/>\n                <field name=\"x_date_from\"/>\n                <field name=\"x_date_to\"/>\n                <field name=\"x_duration_days\"/>\n                <field name=\"x_paid\"/>\n            </group>\n            <group string=\"نطاق الشمول والتطبيق\">\n                <field name=\"x_target_scope\" widget=\"radio\"/>\n                <field name=\"x_name\" readonly=\"1\" string=\"الرمز المرجعي\"/>\n            </group>\n        </group>\n        <notebook>\n            <page string=\"الفروع والشركات المشمولة\" invisible=\"x_target_scope not in ['branch', 'custom', 'all']\">\n                <div class=\"alert alert-info\" role=\"alert\" invisible=\"x_target_scope != 'all'\">\n                    ملاحظة: النطاق محدد على أنه (عام لكافة الفروع)، وسيتم شمول جميع الفروع والشركات تلقائياً.\n                </div>\n                <field name=\"x_company_ids\" widget=\"many2many_tags\" options=\"{'no_create': True}\" placeholder=\"اختر الفروع والشركات المشمولة بالعطلة...\"/>\n            </page>\n            <page string=\"الأقسام المشمولة بالعطلة\" invisible=\"x_target_scope not in ['department', 'custom']\">\n                <field name=\"x_department_ids\" widget=\"many2many_tags\" options=\"{'no_create': True}\" placeholder=\"اختر الأقسام المشمولة بالعطلة...\"/>\n            </page>\n            <page string=\"الموظفون المشمولون بالاسم\" invisible=\"x_target_scope not in ['employee', 'custom']\">\n                <field name=\"x_employee_ids\" widget=\"many2many_tags\" options=\"{'no_create': True}\" placeholder=\"اختر أسماء الموظفين المشمولين تحديداً بهذه العطلة...\"/>\n            </page>\n            <page string=\"سجلات الإجازات الممنوحة للموظفين (المتولدة آلياً)\" invisible=\"x_state != 'confirmed'\">\n                <div class=\"alert alert-success\" role=\"alert\">\n                    تم إنشاء وتثبيت إجازات رسمية مدفوعة الأجر تلقائياً في موديول الإجازات للموظفين المشمولين أدناه:\n                </div>\n                <field name=\"x_leave_ids\" readonly=\"1\">\n                    <list string=\"إجازات العطلة المعتمدة\">\n                        <field name=\"employee_id\" string=\"اسم الموظف\"/>\n                        <field name=\"department_id\" string=\"القسم\"/>\n                        <field name=\"holiday_status_id\" string=\"نوع الإجازة\"/>\n                        <field name=\"date_from\" string=\"من تاريخ\"/>\n                        <field name=\"date_to\" string=\"إلى تاريخ\"/>\n                        <field name=\"number_of_days\" string=\"عدد الأيام\"/>\n                        <field name=\"state\" widget=\"badge\" decoration-success=\"state == 'validate'\"/>\n                    </list>\n                </field>\n            </page>\n            <page string=\"البيان وسند العطلة والملاحظات\">\n                <field name=\"x_notes\" placeholder=\"أدخل هنا أي تفاصيل أو كتاب رسمي أو ملاحظات إضافية تخص العطلة...\"/>\n            </page>\n        </notebook>\n    </sheet>\n</form>",
+        "priority": 16
+      },
+      {
+        "id": 5612,
+        "name": "x_hr_holiday_schedule.list",
+        "type": "list",
+        "arch": "<list string=\"جدول العطل الرسمية والدينية\" decoration-info=\"x_state == 'draft'\" decoration-success=\"x_state == 'confirmed'\" decoration-muted=\"x_state == 'cancelled'\">\n    <field name=\"x_holiday_name\"/>\n    <field name=\"x_holiday_type\"/>\n    <field name=\"x_date_from\"/>\n    <field name=\"x_date_to\"/>\n    <field name=\"x_duration_days\"/>\n    <field name=\"x_target_scope\"/>\n    <field name=\"x_company_ids\" widget=\"many2many_tags\" optional=\"show\"/>\n    <field name=\"x_department_ids\" widget=\"many2many_tags\" optional=\"hide\"/>\n    <field name=\"x_employee_ids\" widget=\"many2many_tags\" optional=\"hide\"/>\n    <field name=\"x_paid\" widget=\"boolean_toggle\"/>\n    <field name=\"x_state\" widget=\"badge\" decoration-info=\"x_state == 'draft'\" decoration-success=\"x_state == 'confirmed'\" decoration-muted=\"x_state == 'cancelled'\"/>\n</list>",
+        "priority": 16
+      },
+      {
+        "id": 5615,
+        "name": "x_hr_holiday_schedule.search",
+        "type": "search",
+        "arch": "<search>\n    <field name=\"x_holiday_name\" string=\"اسم / مناسبة العطلة\"/>\n    <field name=\"x_notes\" string=\"البيان والملاحظات\"/>\n    <field name=\"x_company_ids\" string=\"الفرع\"/>\n    <field name=\"x_department_ids\" string=\"القسم\"/>\n    <field name=\"x_employee_ids\" string=\"اسم الموظف\"/>\n    <separator/>\n    <filter string=\"عطل دينية\" name=\"religious\" domain=\"[['x_holiday_type', '=', 'religious']]\"/>\n    <filter string=\"عطل رسمية / وطنية\" name=\"official\" domain=\"[['x_holiday_type', '=', 'official']]\"/>\n    <filter string=\"عطل طارئة\" name=\"emergency\" domain=\"[['x_holiday_type', '=', 'emergency']]\"/>\n    <separator/>\n    <filter string=\"معتمدة ونافذة\" name=\"confirmed\" domain=\"[['x_state', '=', 'confirmed']]\"/>\n    <filter string=\"مسودة\" name=\"draft\" domain=\"[['x_state', '=', 'draft']]\"/>\n</search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1323,
+        "name": "Holiday Schedule: Cancel",
+        "state": "code",
+        "code": "for rec in records:\n    rec.write({'x_state': 'cancelled'})\n    # Unlink or cancel generated leaves\n    if rec.x_leave_ids:\n        rec.x_leave_ids.unlink()\n"
+      },
+      {
+        "id": 1322,
+        "name": "Holiday Schedule: Confirm",
+        "state": "code",
+        "code": "for rec in records:\n    vals = {'x_state': 'confirmed'}\n    if rec.x_date_from and rec.x_date_to:\n        from_d = rec.x_date_from\n        to_d = rec.x_date_to\n        days = (to_d - from_d).days + 1\n        if days > 0:\n            vals['x_duration_days'] = float(days)\n    name_str = (rec.x_holiday_name or 'عطلة')\n    if rec.x_date_from:\n        name_str += ' (' + str(rec.x_date_from)\n        if rec.x_date_to and rec.x_date_to != rec.x_date_from:\n            name_str += ' إلى ' + str(rec.x_date_to)\n        name_str += ')'\n    vals['x_name'] = name_str\n    if not rec.x_paid:\n        vals['x_paid'] = True\n    rec.write(vals)\n\n    # Resolve covered employees\n    emp_obj = env['hr.employee']\n    leave_obj = env['hr.leave']\n    target_employees = emp_obj.browse()\n\n    scope = rec.x_target_scope\n    if scope == 'all':\n        target_employees = emp_obj.search([('active', '=', True)])\n    elif scope == 'branch':\n        if rec.x_company_ids:\n            target_employees = emp_obj.search([('company_id', 'in', rec.x_company_ids.ids), ('active', '=', True)])\n    elif scope == 'department':\n        if rec.x_department_ids:\n            target_employees = emp_obj.search([('department_id', 'in', rec.x_department_ids.ids), ('active', '=', True)])\n    elif scope == 'employee':\n        target_employees = rec.x_employee_ids\n    elif scope == 'custom':\n        emp_ids = set()\n        if rec.x_company_ids:\n            branch_emps = emp_obj.search([('company_id', 'in', rec.x_company_ids.ids), ('active', '=', True)])\n            emp_ids.update(branch_emps.ids)\n        if rec.x_department_ids:\n            dept_emps = emp_obj.search([('department_id', 'in', rec.x_department_ids.ids), ('active', '=', True)])\n            emp_ids.update(dept_emps.ids)\n        if rec.x_employee_ids:\n            emp_ids.update(rec.x_employee_ids.ids)\n        if emp_ids:\n            target_employees = emp_obj.browse(list(emp_ids))\n\n    # Find leave type: 85 (عطلة رسمية / دينية مدفوعة الأجر)\n    hol_type = env['hr.leave.type'].search([('code', '=', 'PUBLIC_HOLIDAY')], limit=1)\n    type_id = hol_type.id if hol_type else 85\n\n    # Create paid leave for each employee\n    for emp in target_employees:\n        # Check if already created for this holiday and employee\n        exist_leave = leave_obj.search([\n            ('x_holiday_schedule_id', '=', rec.id),\n            ('employee_id', '=', emp.id)\n        ], limit=1)\n        if not exist_leave:\n            leave_obj.create({\n                'holiday_status_id': type_id,\n                'employee_id': emp.id,\n                'request_date_from': rec.x_date_from,\n                'request_date_to': rec.x_date_to,\n                'name': '%s (عطلة رسمية/دينية محددة من الإدارة)' % (rec.x_holiday_name or 'عطلة'),\n                'x_holiday_schedule_id': rec.id,\n                'x_admin_order_number': rec.x_name or 'عطلة رسمية',\n                'x_admin_order_date': rec.x_date_from\n            })\n"
+      },
+      {
+        "id": 1324,
+        "name": "Holiday Schedule: Draft",
+        "state": "code",
+        "code": "for rec in records:\n    rec.write({'x_state': 'draft'})\n    if rec.x_leave_ids:\n        rec.x_leave_ids.unlink()\n"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1325,
+        "name": "العطل الرسمية والدينية",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{'search_default_filter_confirmed': 1}"
+      }
+    ]
+  },
+  "x_branch_memo": {
+    "model_info": {
+      "id": 1838,
+      "model": "x_branch_memo",
+      "name": "مذكرات الفروع والأقسام",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23276,
+        "name": "x_attachment_ids",
+        "field_description": "مرفقات المذكرة (أعداد مفتوحة)",
+        "ttype": "many2many",
+        "relation": "ir.attachment",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23268,
+        "name": "x_company_id",
+        "field_description": "الفرع الصادرة منه المذكرة",
+        "ttype": "many2one",
+        "relation": "res.company",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23270,
+        "name": "x_department_id",
+        "field_description": "القسم الصادرة منه المذكرة",
+        "ttype": "many2one",
+        "relation": "hr.department",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23272,
+        "name": "x_employee_id",
+        "field_description": "الموظف مقدم المذكرة / المنسق",
+        "ttype": "many2one",
+        "relation": "hr.employee",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23266,
+        "name": "x_memo_date",
+        "field_description": "تاريخ المذكرة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23264,
+        "name": "x_memo_number",
+        "field_description": "رقم / إشارة المذكرة",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23256,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23278,
+        "name": "x_state",
+        "field_description": "حالة المذكرة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('draft', 'مسودة'), ('submitted', 'مرسلة للمقر العام'), ('approved', 'تم إصدار أمر إداري'), ('done', 'منجزة ومحفوظة')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23274,
+        "name": "x_subject",
+        "field_description": "مضمون وتفاصيل المذكرة",
+        "ttype": "text",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5626,
+        "name": "x_branch_memo.list",
+        "type": "list",
+        "arch": "<list string=\"مذكرات الفروع والأقسام\" decoration-info=\"x_state == 'submitted'\" decoration-success=\"x_state == 'approved'\">\n    <field name=\"x_memo_number\" string=\"رقم المذكرة\"/>\n    <field name=\"x_memo_date\" string=\"تاريخ المذكرة\"/>\n    <field name=\"x_name\" string=\"الموضوع\"/>\n    <field name=\"x_company_id\" string=\"الفرع المصدر\"/>\n    <field name=\"x_department_id\" string=\"القسم\"/>\n    <field name=\"x_employee_id\" string=\"الموظف\"/>\n    <field name=\"x_attachment_ids\" widget=\"many2many_binary\" string=\"المرفقات\"/>\n    <field name=\"x_state\" string=\"الحالة\" widget=\"badge\" decoration-info=\"x_state == 'draft'\" decoration-warning=\"x_state == 'submitted'\" decoration-success=\"x_state == 'approved'\"/>\n</list>",
+        "priority": 16
+      },
+      {
+        "id": 5627,
+        "name": "x_branch_memo.search",
+        "type": "search",
+        "arch": "<search>\n    <field name=\"x_name\" string=\"الموضوع\"/>\n    <field name=\"x_memo_number\" string=\"رقم المذكرة\"/>\n    <field name=\"x_company_id\" string=\"الفرع\"/>\n    <field name=\"x_department_id\" string=\"القسم\"/>\n    <field name=\"x_employee_id\" string=\"الموظف\"/>\n    <filter string=\"مرسلة للمقر العام\" name=\"submitted\" domain=\"[['x_state', '=', 'submitted']]\"/>\n    <filter string=\"تم إصدار أمر إداري\" name=\"approved\" domain=\"[['x_state', '=', 'approved']]\"/>\n</search>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [],
+    "window_actions": [
+      {
+        "id": 1349,
+        "name": "مذكرات الفروع والأقسام",
+        "view_mode": "list,form",
+        "target": "current",
+        "context": "{}"
+      }
+    ]
+  },
+  "x_lc_expense_line": {
+    "model_info": {
+      "id": 1844,
+      "model": "x_lc_expense_line",
+      "name": "مصاريف وعمولات الاعتماد المستندي",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23490,
+        "name": "x_amount_currency",
+        "field_description": "المبلغ (بالعملة)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23492,
+        "name": "x_amount_iqd",
+        "field_description": "المبلغ (د.ع)",
+        "ttype": "float",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23494,
+        "name": "x_capitalize",
+        "field_description": "يُرسمل على الكلفة؟",
+        "ttype": "boolean",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23484,
+        "name": "x_date",
+        "field_description": "التاريخ",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23488,
+        "name": "x_description",
+        "field_description": "البيان",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23486,
+        "name": "x_expense_type",
+        "field_description": "نوع المصروف / العمولة",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('open_fee', 'عمولة فتح اعتماد'), ('confirm_fee', 'عمولة تعزيز'), ('amend_fee', 'عمولة تعديل / تمديد'), ('swift', 'مصاريف سويفت ومراسلات'), ('insurance', 'تأمين بحري / بري'), ('freight', 'شحن ونقل'), ('customs', 'رسوم جمركية وتخليص'), ('other', 'مصاريف أخرى')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23482,
+        "name": "x_lc_id",
+        "field_description": "الاعتماد المستندي",
+        "ttype": "many2one",
+        "relation": "x_letter_of_credit",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      },
+      {
+        "id": 23496,
+        "name": "x_move_id",
+        "field_description": "القيد المحاسبي",
+        "ttype": "many2one",
+        "relation": "account.move",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": true
+      },
+      {
+        "id": 23406,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      }
+    ],
+    "views": [],
+    "server_actions": [],
+    "window_actions": []
+  },
+  "x_fleet_driver_wizard": {
+    "model_info": {
+      "id": 1840,
+      "model": "x_fleet_driver_wizard",
+      "name": "معالج تغيير سائق الشاحنة",
+      "state": "manual"
+    },
+    "fields": [
+      {
+        "id": 23374,
+        "name": "x_action_type",
+        "field_description": "نوع الإجراء",
+        "ttype": "selection",
+        "relation": false,
+        "selection": "[('assign', 'تسليم واستبدال بسائق جديد'), ('release', 'نزول السائق الحالي (تبقى المركبة بدون سائق)')]",
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23376,
+        "name": "x_current_driver_id",
+        "field_description": "السائق الحالي",
+        "ttype": "many2one",
+        "relation": "res.partner",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": true
+      },
+      {
+        "id": 23346,
+        "name": "x_date_start",
+        "field_description": "تاريخ استلام الشاحنة",
+        "ttype": "date",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23378,
+        "name": "x_datetime_end",
+        "field_description": "وقت وتاريخ نزول السائق الحالي",
+        "ttype": "datetime",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23368,
+        "name": "x_datetime_start",
+        "field_description": "تاريخ ووقت صعود الشاحنة (للسائق الجديد)",
+        "ttype": "datetime",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23353,
+        "name": "x_driver_id",
+        "field_description": "السائق الجديد",
+        "ttype": "many2one",
+        "relation": "res.partner",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23372,
+        "name": "x_entry_datetime",
+        "field_description": "تاريخ ووقت التسجيل في النظام",
+        "ttype": "datetime",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23336,
+        "name": "x_name",
+        "field_description": "Name",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23348,
+        "name": "x_notes",
+        "field_description": "ملاحظات التسليم والاستلام",
+        "ttype": "char",
+        "relation": false,
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": false,
+        "readonly": false
+      },
+      {
+        "id": 23351,
+        "name": "x_vehicle_id",
+        "field_description": "الشاحنة / المركبة",
+        "ttype": "many2one",
+        "relation": "fleet.vehicle",
+        "selection": false,
+        "compute": false,
+        "depends": false,
+        "store": true,
+        "required": true,
+        "readonly": false
+      }
+    ],
+    "views": [
+      {
+        "id": 5641,
+        "name": "x_fleet_driver_wizard_form",
+        "type": "form",
+        "arch": "<form string=\"حركة وسائقي الشاحنة (تسليم / نزول السائق)\">\n    <div class=\"alert alert-info d-flex align-items-center mb-3\" invisible=\"x_action_type != 'assign'\">\n        <i class=\"fa fa-user-plus fa-2x me-3 text-primary\"/>\n        <div>\n            <strong>تسليم الشاحنة لسائق جديد:</strong> سيتم تلقائياً <strong>تحديد وقت نزول السائق السابق بنفس وقت صعود السائق الجديد بالضبط</strong> وتوثيق حركة التكليف.\n        </div>\n    </div>\n    <div class=\"alert alert-warning d-flex align-items-center mb-3\" invisible=\"x_action_type != 'release'\">\n        <i class=\"fa fa-user-times fa-2x me-3 text-warning\"/>\n        <div>\n            <strong>نزول السائق الحالي:</strong> سيتم تسجيل وقت نزول السائق الحالي وإنهاء تكليفه، و<strong>ستبقى الشاحنة بدون سائق</strong>.\n        </div>\n    </div>\n    <group>\n        <group string=\"بيانات الشاحنة والإجراء\">\n            <field name=\"x_vehicle_id\" options=\"{'no_create': True, 'no_create_edit': True}\" placeholder=\"اختر الشاحنة / المركبة...\" required=\"1\"/>\n            <field name=\"x_current_driver_id\" readonly=\"1\" options=\"{'no_open': True}\"/>\n            <field name=\"x_action_type\" widget=\"radio\" options=\"{'horizontal': true}\" required=\"1\"/>\n        </group>\n        <group string=\"بيانات التكليف والصعود\" invisible=\"x_action_type != 'assign'\">\n            <field name=\"x_driver_id\" widget=\"many2one_avatar\" placeholder=\"اختر السائق الجديد...\" required=\"x_action_type == 'assign'\"/>\n            <field name=\"x_datetime_start\" string=\"تاريخ ووقت صعود السائق الجديد\" required=\"x_action_type == 'assign'\"/>\n            <field name=\"x_entry_datetime\" string=\"تاريخ التوثيق بالنظام (آلي)\" readonly=\"1\"/>\n            <field name=\"x_date_start\" invisible=\"1\"/>\n        </group>\n        <group string=\"بيانات النزول وتسليم الشاحنة\" invisible=\"x_action_type != 'release'\">\n            <field name=\"x_datetime_end\" string=\"تاريخ ووقت نزول السائق من الشاحنة\" required=\"x_action_type == 'release'\"/>\n            <field name=\"x_entry_datetime\" string=\"تاريخ التوثيق بالنظام (آلي)\" readonly=\"1\"/>\n        </group>\n    </group>\n    <group string=\"ملاحظات الحركة\">\n        <field name=\"x_notes\" placeholder=\"ملاحظات حول حالة الشاحنة أو أسباب التسليم والنزول...\"/>\n    </group>\n    <footer>\n        <button name=\"1469\" string=\"تأكيد صعود السائق الجديد\" type=\"action\" class=\"btn btn-primary\" invisible=\"x_action_type != 'assign'\"/>\n        <button name=\"1469\" string=\"تأكيد نزول السائق (تبقى المركبة بدون سائق)\" type=\"action\" class=\"btn btn-warning\" invisible=\"x_action_type != 'release'\"/>\n        <button string=\"إلغاء\" class=\"btn btn-secondary\" special=\"cancel\"/>\n    </footer>\n</form>",
+        "priority": 16
+      }
+    ],
+    "server_actions": [
+      {
+        "id": 1469,
+        "name": "Fleet Driver Wizard: Confirm Change",
+        "state": "code",
+        "code": "\nwizard = record\nvehicle = wizard.x_vehicle_id\naction_type = wizard.x_action_type or 'assign'\nnotes = wizard.x_notes\nnow_dt = datetime.datetime.now()\nentry_dt = wizard.x_entry_datetime or now_dt\n\nif vehicle:\n    if action_type == 'release':\n        # DRIVER GETS OFF / VEHICLE REMAINS WITHOUT DRIVER\n        drop_dt = wizard.x_datetime_end or now_dt\n        try:\n            drop_d = drop_dt.date()\n        except Exception:\n            drop_d = datetime.date.today()\n            \n        open_logs = env['fleet.vehicle.assignation.log'].search([\n            ('vehicle_id', '=', vehicle.id),\n            ('date_end', '=', False)\n        ])\n        for old in open_logs:\n            old_notes = old.x_notes or ''\n            close_note = 'نزول السائق بتاريخ ووقت: %s' % str(drop_dt)[:16]\n            full_note = (old_notes + ' | ' + close_note + (' - ' + notes if notes else '')) if old_notes else (close_note + (' - ' + notes if notes else ''))\n            old.write({\n                'date_end': drop_d,\n                'x_datetime_end': drop_dt,\n                'x_notes': full_note,\n            })\n            \n        vehicle.write({'driver_id': False})\n        \n    elif action_type == 'assign':\n        # ASSIGN / REPLACE DRIVER\n        new_driver = wizard.x_driver_id\n        if new_driver:\n            board_dt = wizard.x_datetime_start or now_dt\n            try:\n                board_d = board_dt.date()\n            except Exception:\n                board_d = datetime.date.today()\n                \n            # Close old driver log: drop-off time matches new driver's boarding time exactly!\n            open_logs = env['fleet.vehicle.assignation.log'].search([\n                ('vehicle_id', '=', vehicle.id),\n                ('date_end', '=', False)\n            ])\n            for old in open_logs:\n                old_notes = old.x_notes or ''\n                handover_note = 'تسليم الشاحنة إلى (%s) بتاريخ ووقت: %s' % (new_driver.name, str(board_dt)[:16])\n                full_note = (old_notes + ' | ' + handover_note) if old_notes else handover_note\n                old.write({\n                    'date_end': board_d,\n                    'x_datetime_end': board_dt,\n                    'x_notes': full_note,\n                })\n                \n            vehicle.write({'driver_id': new_driver.id})\n            \n            curr_log = env['fleet.vehicle.assignation.log'].search([\n                ('vehicle_id', '=', vehicle.id),\n                ('driver_id', '=', new_driver.id),\n                ('date_end', '=', False)\n            ], limit=1, order='id desc')\n            if curr_log:\n                curr_log.write({\n                    'date_start': board_d,\n                    'x_datetime_start': board_dt,\n                    'x_entry_datetime': entry_dt,\n                    'x_notes': notes or False,\n                })\n            else:\n                env['fleet.vehicle.assignation.log'].create({\n                    'vehicle_id': vehicle.id,\n                    'driver_id': new_driver.id,\n                    'date_start': board_d,\n                    'x_datetime_start': board_dt,\n                    'x_entry_datetime': entry_dt,\n                    'x_notes': notes or False,\n                })\n\naction = {'type': 'ir.actions.act_window_close'}\n"
+      }
+    ],
+    "window_actions": [
+      {
+        "id": 1543,
+        "name": "تسجيل صعود / نزول سائق",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{'default_x_action_type': 'assign'}"
+      },
+      {
+        "id": 1470,
+        "name": "تسليم / صعود سائق جديد",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{'default_x_action_type': 'assign'}"
+      },
+      {
+        "id": 1521,
+        "name": "نزول السائق (إخلاء الشاحنة)",
+        "view_mode": "form",
+        "target": "new",
+        "context": "{'default_x_action_type': 'release'}"
+      }
+    ]
+  }
+}
