@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tender Bid List View -->
+    <record id="view_iraqi_tender_bid_list" model="ir.ui.view">
+        <field name="name">iraqi.tender.bid.list</field>
+        <field name="model">iraqi.tender.bid</field>
+        <field name="arch" type="xml">
+            <list string="عطاءات وعروض المناقصة" decoration-success="state == 'awarded'" decoration-info="state == 'accepted'" decoration-muted="state == 'rejected'">
+                <field name="financial_rank"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tender_id"/>
+                <field name="submission_date"/>
+                <field name="total_bid_amount" widget="monetary"/>
+                <field name="variance_with_estimated" widget="monetary" decoration-danger="variance_with_estimated &gt; 0" decoration-success="variance_with_estimated &lt;= 0"/>
+                <field name="has_bid_bond"/>
+                <field name="bid_bond_amount" widget="monetary" optional="show"/>
+                <field name="technical_score" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'awarded'" decoration-info="state == 'accepted'" decoration-warning="state == 'under_eval'" decoration-muted="state == 'rejected'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tender Bid Form View -->
+    <record id="view_iraqi_tender_bid_form" model="ir.ui.view">
+        <field name="name">iraqi.tender.bid.form</field>
+        <field name="model">iraqi.tender.bid</field>
+        <field name="arch" type="xml">
+            <form string="عطاء وعرض المناقصة">
+                <header>
+                    <button name="action_accept" string="قبول العطاء (مطابق فنياً)" type="object" invisible="state in ('accepted', 'awarded')" class="btn-primary"/>
+                    <button name="action_reject" string="استبعاد العطاء" type="object" invisible="state in ('rejected', 'awarded')" class="btn-danger"/>
+                    <field name="state" widget="statusbar" statusbar_visible="submitted,under_eval,accepted,awarded"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="رمز العطاء"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="بيانات العطاء ومقدم العرض">
+                            <field name="tender_id"/>
+                            <field name="partner_id"/>
+                            <field name="submission_date"/>
+                        </group>
+                        <group string="التقييم المالي والفارق التخميني">
+                            <field name="total_bid_amount" widget="monetary"/>
+                            <field name="variance_with_estimated" widget="monetary" decoration-danger="variance_with_estimated &gt; 0" decoration-success="variance_with_estimated &lt;= 0"/>
+                            <field name="variance_percentage"/>
+                            <field name="financial_rank"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="التأمينات الأولية (كفالة دخول المناقصة - Bid Bond)">
+                        <group>
+                            <field name="has_bid_bond"/>
+                            <field name="bid_bond_number" invisible="not has_bid_bond"/>
+                            <field name="bid_bond_bank" invisible="not has_bid_bond"/>
+                        </group>
+                        <group>
+                            <field name="bid_bond_amount" widget="monetary" invisible="not has_bid_bond"/>
+                            <field name="bid_bond_expiry_date" invisible="not has_bid_bond"/>
+                            <field name="bid_bond_status" widget="badge" invisible="not has_bid_bond"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="جدول تسعير بنود العطاء" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="tender_line_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="التقييم الفني ومحضر لجنة التحليل" name="evaluation">
+                            <group>
+                                <group>
+                                    <field name="is_technically_accepted"/>
+                                    <field name="technical_score"/>
+                                </group>
+                            </group>
+                            <field name="evaluation_notes" placeholder="توصيات وملاحظات لجنة دراسة وتحليل العطاءات..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tender Bid Search View -->
+    <record id="view_iraqi_tender_bid_search" model="ir.ui.view">
+        <field name="name">iraqi.tender.bid.search</field>
+        <field name="model">iraqi.tender.bid</field>
+        <field name="arch" type="xml">
+            <search string="بحث العطاءات">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tender_id"/>
+                <field name="bid_bond_number"/>
+                <separator/>
+                <filter string="العطاءات الفائزة (المحالة)" name="filter_awarded" domain="[('state', '=', 'awarded')]"/>
+                <filter string="العطاءات المقبولة فنياً" name="filter_accepted" domain="[('state', '=', 'accepted')]"/>
+                <filter string="المستبعدة" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <group>
+                    <filter string="المناقصة" name="group_by_tender" domain="[]" context="{'group_by': 'tender_id'}"/>
+                    <filter string="مقدم العطاء" name="group_by_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="الحالة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tender Bid Action -->
+    <record id="action_iraqi_tender_bid_all" model="ir.actions.act_window">
+        <field name="name">عطاءات وعروض المناقصات</field>
+        <field name="res_model">iraqi.tender.bid</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_iraqi_tender_bid_search"/>
+    </record>
+</odoo>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_ipc_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article doc_report_layout_standard" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; color: #222;">
+                    
+                    <!-- Header -->
+                    <div style="border-bottom: 2px solid #1a3a5f; padding-bottom: 10px; margin-bottom: 15px;">
+                        <table style="width: 100%; text-align: center;">
+                            <tr>
+                                <td style="width: 30%; text-align: right; vertical-align: middle;">
+                                    <h4 style="margin: 0; color: #1a3a5f; font-weight: bold;"><span t-field="o.company_id.name"/></h4>
+                                    <p style="margin: 2px 0 0 0; font-size: 11px; color: #555;">قسم العقود والمشاريع الهندسية</p>
+                                </td>
+                                <td style="width: 40%; text-align: center; vertical-align: middle;">
+                                    <h2 style="margin: 0; color: #1a3a5f; font-weight: bold; font-size: 20px;">كشف ذرعة منجزة دورية (سلفة منجزة)</h2>
+                                    <h4 style="margin: 4px 0 0 0; color: #444; font-size: 14px;">Interim Payment Certificate (IPC)</h4>
+                                </td>
+                                <td style="width: 30%; text-align: left; vertical-align: middle;">
+                                    <p style="margin: 0; font-weight: bold; font-size: 13px; color: #1a3a5f;">رقم الذرعة: <span t-field="o.name"/></p>
+                                    <p style="margin: 2px 0 0 0; font-size: 12px;">تسلسل السلفة: (<span t-field="o.sequence_in_project"/>)</p>
+                                    <p style="margin: 2px 0 0 0; font-size: 11px;">التاريخ: <span t-field="o.date"/></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Project & Contract Info Box -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 15%; font-weight: bold; color: #1a3a5f;">اسم المشروع:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 35%; font-weight: bold;"><span t-field="o.project_id.name"/></td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 15%; font-weight: bold; color: #1a3a5f;">رب العمل / الجهة المالكة:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 35%;"><span t-field="o.partner_id.name"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; font-weight: bold; color: #1a3a5f;">رقم وتاريخ العقد:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6;"><span t-field="o.project_id.contract_ref"/> (تاريخ: <span t-field="o.project_id.contract_sign_date"/>)</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; font-weight: bold; color: #1a3a5f;">فترة إنجاز هذه الذرعة:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6;">من <span t-field="o.period_start"/> إلى <span t-field="o.period_end"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; font-weight: bold; color: #1a3a5f;">قيمة العقد الحالية:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; font-weight: bold;"><span t-field="o.project_id.contract_value_current" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; font-weight: bold; color: #1a3a5f;">المهندس المقيم المدقق:</td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6;"><span t-field="o.resident_engineer_id.name"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- BOQ IPC Lines Table -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 15px; border: 1px solid #333;">
+                        <thead>
+                            <tr style="background-color: #1a3a5f; color: #ffffff; text-align: center;">
+                                <th rowspan="2" style="border: 1px solid #444; padding: 5px; width: 5%;">ت</th>
+                                <th rowspan="2" style="border: 1px solid #444; padding: 5px; width: 25%;">تفاصيل الفقرة ومواصفات العمل</th>
+                                <th rowspan="2" style="border: 1px solid #444; padding: 5px; width: 6%;">الوحدة</th>
+                                <th rowspan="2" style="border: 1px solid #444; padding: 5px; width: 8%;">الكمية العقدية المعدلة</th>
+                                <th rowspan="2" style="border: 1px solid #444; padding: 5px; width: 8%;">سعر الوحدة (<span t-field="o.currency_id.name"/>)</th>
+                                <th colspan="3" style="border: 1px solid #444; padding: 5px; width: 24%;">الكميات المقاسة المنفذة (الذرعة)</th>
+                                <th colspan="3" style="border: 1px solid #444; padding: 5px; width: 24%;">المبالغ المالية المستحقة (<span t-field="o.currency_id.name"/>)</th>
+                            </tr>
+                            <tr style="background-color: #2b547e; color: #ffffff; text-align: center; font-size: 10px;">
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">التراكمي السابق</th>
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">الفترة الحالية</th>
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">التراكمي الكلي</th>
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">المبلغ السابق</th>
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">مبلغ الفترة</th>
+                                <th style="border: 1px solid #444; padding: 4px; width: 8%;">المبلغ التراكمي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="idx" t-value="1"/>
+                            <tr t-foreach="o.line_ids" t-as="line" style="text-align: center; page-break-inside: avoid;">
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-field="line.item_no"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; text-align: right;"><span t-field="line.name"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-field="line.uom_id.name"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.contract_qty)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.unit_price)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.previous_qty)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold; background-color: #fcf8e3;"><span t-esc="'{:,.2f}'.format(line.current_qty)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold;"><span t-esc="'{:,.2f}'.format(line.cumulative_qty)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.previous_amount)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold; background-color: #fcf8e3;"><span t-esc="'{:,.2f}'.format(line.current_amount)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold;"><span t-esc="'{:,.2f}'.format(line.cumulative_amount)"/></td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2; font-weight: bold; text-align: center;">
+                                <td colspan="8" style="border: 1px solid #999; padding: 6px; text-align: left;">المجموع الإجمالي للأعمال المنفذة:</td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-field="o.previous_gross_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="border: 1px solid #999; padding: 6px; background-color: #fcf8e3;"><span t-field="o.current_gross_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-field="o.gross_cumulative_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Financial Deductions Summary & Net Calculation -->
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 11px; page-break-inside: avoid;">
+                        <tr>
+                            <!-- Left: Summary Matrix -->
+                            <td style="width: 55%; vertical-align: top; padding-left: 15px;">
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #1a3a5f;">
+                                    <tr style="background-color: #1a3a5f; color: #fff; font-weight: bold;">
+                                        <th colspan="2" style="padding: 6px; text-align: center;">بيان الحساب الختامي للذرعة والاستقطاعات النظامية</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; width: 65%;">إجمالي قيمة الأعمال التراكمية المنجزة حتى تاريخه:</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; text-align: left; font-weight: bold;"><span t-field="o.gross_cumulative_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; color: #777;">تنزيل: إجمالي السلف التراكمية السابقة:</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; text-align: left; color: #777;">(<span t-field="o.previous_gross_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>)</td>
+                                    </tr>
+                                    <tr style="background-color: #fdf5e6; font-weight: bold;">
+                                        <td style="padding: 6px; border-bottom: 1px solid #ddd; color: #8a6d3b;">صافي استحقاق الأعمال المنفذة للفترة الحالية:</td>
+                                        <td style="padding: 6px; border-bottom: 1px solid #ddd; text-align: left; color: #8a6d3b;"><span t-field="o.current_gross_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd;">تنزيل: استرداد السلفة التشغيلية (<span t-field="o.advance_deduction_percent"/>%):</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; text-align: left; color: #d9534f;">- <span t-field="o.advance_deduction_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd;">تنزيل: أمانات الصيانة والاستقطاعات النظامية (<span t-field="o.retention_percent"/>%):</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #ddd; text-align: left; color: #d9534f;">- <span t-field="o.retention_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <t t-if="o.other_deductions_amount > 0">
+                                        <tr>
+                                            <td style="padding: 5px; border-bottom: 1px solid #ddd;">تنزيل: غرامات واستقطاعات أخرى (<span t-field="o.other_deductions_note"/>):</td>
+                                            <td style="padding: 5px; border-bottom: 1px solid #ddd; text-align: left; color: #d9534f;">- <span t-field="o.other_deductions_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="background-color: #dff0d8; font-weight: bold; font-size: 13px;">
+                                        <td style="padding: 8px; color: #3c763d;">صافي المبلغ المستحق للصرف بموجب هذه السلفة:</td>
+                                        <td style="padding: 8px; text-align: left; color: #3c763d;"><span t-field="o.net_payable_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                            <!-- Right: Status & Balances -->
+                            <td style="width: 45%; vertical-align: top;">
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc; background-color: #fafafa;">
+                                    <tr style="background-color: #eee; font-weight: bold;">
+                                        <th colspan="2" style="padding: 6px; text-align: center;">موقف السلفة التشغيلية وأمانات الصيانة الكلية</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee;">إجمالي السلفة التشغيلية المستلمة:</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee; text-align: left;"><span t-field="o.project_id.advance_payment_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee;">المتبقي من السلفة التشغيلية بذمة المشروع:</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee; text-align: left; font-weight: bold;"><span t-field="o.project_id.advance_payment_balance" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee;">إجمالي أمانات الصيانة المحتجزة حتى تاريخه:</td>
+                                        <td style="padding: 5px; border-bottom: 1px solid #eee; text-align: left; font-weight: bold;"><span t-field="o.project_id.retention_balance_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px;">نسبة الإنجاز المالي الكلي للمشروع:</td>
+                                        <td style="padding: 5px; text-align: left; font-weight: bold;"><span t-esc="'{:,.2f}%'.format(o.project_id.overall_project_progress)"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Iraqi Official Signatures Footer -->
+                    <div style="margin-top: 30px; page-break-inside: avoid; border-top: 1px solid #999; padding-top: 10px;">
+                        <table style="width: 100%; text-align: center; font-size: 11px;">
+                            <tr>
+                                <td style="width: 25%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">مهندس الموقع المنفذ</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                    <p style="margin: 0; color: #666;">التاريخ: .... / .... / ........</p>
+                                </td>
+                                <td style="width: 25%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">المهندس المقيم المشرف</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                    <p style="margin: 0; color: #666;">التاريخ: .... / .... / ........</p>
+                                </td>
+                                <td style="width: 25%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">المدقق المالي للمشاريع</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                    <p style="margin: 0; color: #666;">التاريخ: .... / .... / ........</p>
+                                </td>
+                                <td style="width: 25%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">مصادقة رب العمل / المدير المفوض</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                    <p style="margin: 0; color: #666;">التاريخ: .... / .... / ........</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

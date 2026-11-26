@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BOQ Line Tree / List View -->
+    <record id="view_contracting_project_boq_tree" model="ir.ui.view">
+        <field name="name">contracting.project.boq.list</field>
+        <field name="model">contracting.project.boq</field>
+        <field name="arch" type="xml">
+            <list string="جدول الكميات والتسعير (BOQ)" decoration-info="state == 'draft'" decoration-warning="state == 'in_progress'" decoration-success="state == 'completed'">
+                <field name="sequence" widget="handle"/>
+                <field name="item_no"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="package_id"/>
+                <field name="uom_id"/>
+                <field name="contract_qty" string="الكمية العقدية"/>
+                <field name="vo_qty" string="أوامر الغيار" optional="show"/>
+                <field name="revised_contract_qty" string="الكمية المعدلة"/>
+                <field name="tender_unit_price" widget="monetary"/>
+                <field name="revised_total_amount" string="إجمالي القيمة" widget="monetary" sum="إجمالي قيمة جدول الكميات"/>
+                <field name="total_estimated_budget" string="موازنة التكلفة" widget="monetary" sum="إجمالي موازنة التكلفة" optional="show"/>
+                <field name="total_incurred_cost" string="المنفق والمحجوز" widget="monetary" sum="إجمالي المنفق والمحجوز" optional="show"/>
+                <field name="remaining_budget" string="المتبقي من الميزانية" widget="monetary" sum="إجمالي المتبقي" optional="show"/>
+                <field name="cumulative_qty" string="الذرعة التراكمية"/>
+                <field name="completion_percentage" widget="progressbar" string="الإنجاز %"/>
+                <field name="boq_alert_state" widget="badge" decoration-success="boq_alert_state == 'normal'" decoration-warning="boq_alert_state == 'warning_80'" decoration-primary="boq_alert_state == 'warning_100'" decoration-danger="boq_alert_state == 'exceeded'" string="مؤشر الرقابة"/>
+                <field name="cost_variance_amount" widget="monetary" sum="إجمالي الانحراف" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-primary="state == 'confirmed'" decoration-warning="state == 'in_progress'" decoration-success="state == 'completed'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- BOQ Line Form View -->
+    <record id="view_contracting_project_boq_form" model="ir.ui.view">
+        <field name="name">contracting.project.boq.form</field>
+        <field name="model">contracting.project.boq</field>
+        <field name="arch" type="xml">
+            <form string="بند جدول الكميات والتسعير">
+                <header>
+                    <button name="action_confirm" string="اعتماد الفقرة" type="object" invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_start_progress" string="بدء التنفيذ" type="object" invisible="state != 'confirmed'" class="btn-primary"/>
+                    <button name="action_complete" string="إكمال الفقرة (100%)" type="object" invisible="state != 'in_progress'" class="btn-success"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state in ('draft', 'completed')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="item_no" string="رقم الفقرة"/>
+                        <h1>
+                            <field name="item_no" placeholder="مثال: 1.1 أو 2.3"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="بيانات المشروع والحزمة">
+                            <field name="project_id"/>
+                            <field name="package_id"/>
+                            <field name="uom_id"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="الكميات والأسعار العقدية">
+                            <field name="contract_qty"/>
+                            <field name="vo_qty"/>
+                            <field name="revised_contract_qty"/>
+                            <field name="tender_unit_price" widget="monetary"/>
+                            <field name="total_tender_amount" widget="monetary"/>
+                            <field name="revised_total_amount" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="وصف المواصفات الفنية وجدول الكميات" name="description">
+                            <field name="name" placeholder="أدخل الوصف التفصيلي للفقرة والمواصفات الهندسية ومواد التنفيذ..."/>
+                        </page>
+
+                        <page string="الرقابة على الموازنة التقديرية والتكاليف" name="cost_control">
+                            <group>
+                                <group string="الموازنة التقديرية المخططة">
+                                    <field name="estimated_cost_unit_price" widget="monetary"/>
+                                    <field name="total_estimated_budget" widget="monetary"/>
+                                </group>
+                                <group string="متابعة التكاليف الفعلية والمحجوزة">
+                                    <field name="committed_cost_amount" widget="monetary"/>
+                                    <field name="material_consumed_amount" widget="monetary"/>
+                                    <field name="subcontractor_executed_amount" widget="monetary"/>
+                                    <field name="actual_cost_amount" widget="monetary" style="font-weight: bold;"/>
+                                    <field name="total_incurred_cost" widget="monetary"/>
+                                    <field name="remaining_budget" widget="monetary"/>
+                                    <field name="budget_consumed_percent" widget="progressbar"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="تحليل المواد والمكونات المعيارية (BOM)" name="material_bom">
+                            <field name="material_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="uom_id"/>
+                                    <field name="standard_qty_per_unit"/>
+                                    <field name="planned_total_qty"/>
+                                    <field name="standard_unit_cost" widget="monetary"/>
+                                    <field name="estimated_subtotal" widget="monetary" sum="إجمالي تكلفة المواد"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="أذونات صرف المواد المصروفة من المخزن" name="requisitions">
+                            <field name="requisition_line_ids" readonly="1">
+                                <list>
+                                    <field name="requisition_id"/>
+                                    <field name="product_id"/>
+                                    <field name="uom_id"/>
+                                    <field name="issued_qty"/>
+                                    <field name="unit_cost" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary" sum="إجمالي المصروف"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="متابعة الذرعات الشهرية ونسب الإنجاز" name="progress_tracking">
+                            <group>
+                                <group string="كميات الذرعات المنفذة">
+                                    <field name="previous_cumulative_qty"/>
+                                    <field name="current_executed_qty"/>
+                                    <field name="cumulative_qty"/>
+                                </group>
+                                <group string="المطابقة المالية ونسبة الإنجاز">
+                                    <field name="completion_percentage" widget="progressbar"/>
+                                    <field name="cumulative_amount" widget="monetary"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="التوزيع التحليلي ثلاثي الأبعاد" name="analytic">
+                            <group>
+                                <field name="analytic_precision" invisible="1"/>
+                                <field name="analytic_distribution" widget="analytic_distribution"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- BOQ Search View -->
+    <record id="view_contracting_project_boq_search" model="ir.ui.view">
+        <field name="name">contracting.project.boq.search</field>
+        <field name="model">contracting.project.boq</field>
+        <field name="arch" type="xml">
+            <search string="بحث جدول الكميات">
+                <field name="item_no"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="package_id"/>
+                <separator/>
+                <filter string="المسودات" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="المعتمدة" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="قيد التنفيذ" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="المكتملة" name="completed" domain="[('state', '=', 'completed')]"/>
+                <group>
+                    <filter string="المشروع" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="حزمة العمل" name="group_by_package" domain="[]" context="{'group_by': 'package_id'}"/>
+                    <filter string="الحالة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- BOQ Pivot & Graph Views -->
+    <record id="view_contracting_project_boq_pivot" model="ir.ui.view">
+        <field name="name">contracting.project.boq.pivot</field>
+        <field name="model">contracting.project.boq</field>
+        <field name="arch" type="xml">
+            <pivot string="تحليل جدول الكميات والتكاليف">
+                <field name="project_id" type="row"/>
+                <field name="package_id" type="row"/>
+                <field name="revised_total_amount" type="measure"/>
+                <field name="total_estimated_budget" type="measure"/>
+                <field name="total_incurred_cost" type="measure"/>
+                <field name="remaining_budget" type="measure"/>
+                <field name="cumulative_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_contracting_project_boq_graph" model="ir.ui.view">
+        <field name="name">contracting.project.boq.graph</field>
+        <field name="model">contracting.project.boq</field>
+        <field name="arch" type="xml">
+            <graph string="مخطط مقارنة موازنات وإنجاز جدول الكميات" type="bar">
+                <field name="package_id"/>
+                <field name="revised_total_amount" type="measure"/>
+                <field name="cumulative_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_contracting_project_boq" model="ir.actions.act_window">
+        <field name="name">جدول الكميات والتسعير (BOQ)</field>
+        <field name="res_model">contracting.project.boq</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_contracting_project_boq_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أضف أول فقرة في جدول الكميات والتسعير (BOQ) للمشروع الإنشائي!
+            </p>
+        </field>
+    </record>
+
+    <!-- BOQ Package Views -->
+    <record id="view_contracting_boq_package_tree" model="ir.ui.view">
+        <field name="name">contracting.boq.package.list</field>
+        <field name="model">contracting.boq.package</field>
+        <field name="arch" type="xml">
+            <list string="حزم عمل جدول الكميات" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="analytic_account_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_contracting_boq_package" model="ir.actions.act_window">
+        <field name="name">حزم عمل جدول الكميات (BOQ Packages)</field>
+        <field name="res_model">contracting.boq.package</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Cost Elements Views -->
+    <record id="view_contracting_cost_element_tree" model="ir.ui.view">
+        <field name="name">contracting.cost.element.list</field>
+        <field name="model">contracting.cost.element</field>
+        <field name="arch" type="xml">
+            <list string="عناصر التكلفة الإنشائية" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="analytic_account_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_contracting_cost_element" model="ir.actions.act_window">
+        <field name="name">عناصر التكلفة الإنشائية (Cost Elements)</field>
+        <field name="res_model">contracting.cost.element</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_boq_variance_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article doc_report_layout_standard" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11.5px; color: #222;">
+                    
+                    <!-- Header -->
+                    <div style="border-bottom: 2px solid #1a3a5f; padding-bottom: 10px; margin-bottom: 15px;">
+                        <table style="width: 100%; text-align: center;">
+                            <tr>
+                                <td style="width: 30%; text-align: right; vertical-align: middle;">
+                                    <h4 style="margin: 0; color: #1a3a5f; font-weight: bold;"><span t-field="o.company_id.name"/></h4>
+                                    <p style="margin: 2px 0 0 0; font-size: 11px; color: #555;">قسم السيطرة والرقابة على التكاليف الإنشائية</p>
+                                </td>
+                                <td style="width: 40%; text-align: center; vertical-align: middle;">
+                                    <h2 style="margin: 0; color: #1a3a5f; font-weight: bold; font-size: 19px;">تقرير انحراف تكاليف وموازنة جدول الكميات</h2>
+                                    <h4 style="margin: 4px 0 0 0; color: #444; font-size: 13px;">BOQ Cost Variance &amp; Budget Control Analysis</h4>
+                                </td>
+                                <td style="width: 30%; text-align: left; vertical-align: middle;">
+                                    <p style="margin: 0; font-weight: bold; font-size: 12px; color: #1a3a5f;">المشروع: <span t-field="o.name"/></p>
+                                    <p style="margin: 2px 0 0 0; font-size: 11px;">العقد: <span t-field="o.contract_ref"/></p>
+                                    <p style="margin: 2px 0 0 0; font-size: 11px;">التاريخ: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Summary KPI Box -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <tr style="text-align: center;">
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 25%;">
+                                <small class="text-muted d-block">إجمالي موازنة التكلفة التقديرية</small>
+                                <strong style="font-size: 13px; color: #1a3a5f;"><span t-field="o.total_boq_estimated_budget" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong>
+                            </td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 25%;">
+                                <small class="text-muted d-block">التكاليف المحجوزة بأوامر الشراء</small>
+                                <strong style="font-size: 13px; color: #f0ad4e;"><span t-field="o.total_committed_costs" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong>
+                            </td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 25%;">
+                                <small class="text-muted d-block">التكاليف الفعلية المصروفة</small>
+                                <strong style="font-size: 13px; color: #0275d8;"><span t-field="o.total_actual_costs" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong>
+                            </td>
+                            <td style="padding: 6px; border: 1px solid #dee2e6; width: 25%;">
+                                <small class="text-muted d-block">صافي الرصيد المتبقي المتاح</small>
+                                <strong style="font-size: 13px; color: #5cb85c;"><span t-esc="'{:,.2f}'.format(o.total_boq_estimated_budget - (o.total_committed_costs + o.total_actual_costs))"/> <span t-field="o.currency_id.symbol"/></strong>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- BOQ Variance Table -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 15px; border: 1px solid #333;">
+                        <thead>
+                            <tr style="background-color: #1a3a5f; color: #ffffff; text-align: center;">
+                                <th style="border: 1px solid #444; padding: 5px; width: 5%;">ت</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 25%;">وصف الفقرة الإنشائية</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 6%;">الوحدة</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 8%;">الكمية المعدلة</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 11%;">موازنة التكلفة المخططة</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 11%;">التكاليف المحجوزة (PO)</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 11%;">التكاليف الفعلية المصروفة</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 11%;">إجمالي المنفق والمحجوز</th>
+                                <th style="border: 1px solid #444; padding: 5px; width: 12%;">انحراف الموازنة (+/-)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.boq_line_ids" t-as="line" style="text-align: center; page-break-inside: avoid;">
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold;"><span t-field="line.item_no"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; text-align: right;"><span t-field="line.name"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-field="line.uom_id.name"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.revised_contract_qty)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.total_estimated_budget)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.committed_cost_amount)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px;"><span t-esc="'{:,.2f}'.format(line.actual_cost_amount)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold;"><span t-esc="'{:,.2f}'.format(line.total_incurred_cost)"/></td>
+                                <td style="border: 1px solid #ccc; padding: 4px; font-weight: bold;" t-att-style="'color: ' + ('#5cb85c' if line.cost_variance_amount >= 0 else '#d9534f') + ';'">
+                                    <span t-esc="'{:,.2f}'.format(line.cost_variance_amount)"/>
+                                </td>
+                            </tr>
+                            <tr style="background-color: #f2f2f2; font-weight: bold; text-align: center;">
+                                <td colspan="4" style="border: 1px solid #999; padding: 6px; text-align: left;">المجموع الكلي لموازنة وانحراف المشروع:</td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-field="o.total_boq_estimated_budget" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-field="o.total_committed_costs" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-field="o.total_actual_costs" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                <td style="border: 1px solid #999; padding: 6px;"><span t-esc="'{:,.2f}'.format(o.total_committed_costs + o.total_actual_costs)"/></td>
+                                <td style="border: 1px solid #999; padding: 6px; color: #1a3a5f;"><span t-esc="'{:,.2f}'.format(o.total_boq_estimated_budget - (o.total_committed_costs + o.total_actual_costs))"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Official Signatures -->
+                    <div style="margin-top: 30px; page-break-inside: avoid; border-top: 1px solid #999; padding-top: 10px;">
+                        <table style="width: 100%; text-align: center; font-size: 11px;">
+                            <tr>
+                                <td style="width: 33%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">مهندس التكاليف والموازنات</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                </td>
+                                <td style="width: 33%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">المهندس المقيم المشرف</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                </td>
+                                <td style="width: 33%;">
+                                    <p style="font-weight: bold; margin-bottom: 40px;">المدير المالي والتدقيق</p>
+                                    <p style="margin: 0;">التوقيع: ..........................</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Variation Order List View -->
+    <record id="view_contracting_variation_order_tree" model="ir.ui.view">
+        <field name="name">contracting.variation.order.list</field>
+        <field name="model">contracting.variation.order</field>
+        <field name="arch" type="xml">
+            <list string="أوامر الغيار (Variation Orders)" decoration-info="state == 'draft'" decoration-warning="state in ('submitted', 'engineer_approved')" decoration-success="state == 'client_approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="date"/>
+                <field name="engineer_in_charge_id"/>
+                <field name="client_ref"/>
+                <field name="total_revenue_change" widget="monetary" sum="إجمالي تغيير الإيرادات"/>
+                <field name="total_cost_budget_change" widget="monetary" sum="إجمالي تغيير الموازنة" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state in ('submitted', 'engineer_approved')" decoration-success="state == 'client_approved'" decoration-danger="state == 'rejected'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Variation Order Form View -->
+    <record id="view_contracting_variation_order_form" model="ir.ui.view">
+        <field name="name">contracting.variation.order.form</field>
+        <field name="model">contracting.variation.order</field>
+        <field name="arch" type="xml">
+            <form string="أمر غيار هندسي وإداري">
+                <header>
+                    <button name="action_submit" string="تقديم للمهندس المقيم" type="object" invisible="state != 'draft'" class="btn-primary" groups="iraqi_contracting_management.group_contracting_site_engineer,iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_engineer_approve" string="موافقة المهندس المقيم" type="object" invisible="state != 'submitted'" class="btn-primary" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_client_approve" string="اعتماد ومصادقة رب العمل" type="object" invisible="state != 'engineer_approved'" class="btn-success" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_reject" string="رفض أمر الغيار" type="object" invisible="state in ('draft', 'client_approved', 'rejected')" class="btn-danger" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state not in ('rejected', 'submitted')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,engineer_approved,client_approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="رقم أمر الغيار"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="بيانات المشروع والإشراف">
+                            <field name="project_id" readonly="state != 'draft'"/>
+                            <field name="engineer_in_charge_id" readonly="state in ('client_approved', 'rejected')"/>
+                            <field name="date" readonly="state in ('client_approved', 'rejected')"/>
+                        </group>
+                        <group string="المصادقات الرسمية">
+                            <field name="client_ref" placeholder="رقم وتاريخ كتاب دائرة المهندس المقيم / رب العمل" readonly="state == 'client_approved'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="الأسباب والمبررات الفنية والموقعية">
+                        <field name="reason" placeholder="وضح بالتفصيل الأسباب الموجبة لاستحداث أو تعديل الفقرات..." readonly="state == 'client_approved'"/>
+                    </group>
+
+                    <notebook>
+                        <page string="فقرات جدول الكميات المعدلة والمستحدثة" name="lines">
+                            <field name="line_ids" readonly="state == 'client_approved'">
+                                <list editable="bottom">
+                                    <field name="change_type"/>
+                                    <field name="boq_id" domain="[('project_id', '=', parent.project_id)]" required="change_type in ('qty_change', 'price_change', 'omission')"/>
+                                    <field name="item_no"/>
+                                    <field name="name"/>
+                                    <field name="package_id" optional="show"/>
+                                    <field name="uom_id"/>
+                                    <field name="current_contract_qty" readonly="1" force_save="1"/>
+                                    <field name="delta_qty"/>
+                                    <field name="new_qty" readonly="1" force_save="1"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="estimated_cost_unit_price" widget="monetary" optional="show"/>
+                                    <field name="subtotal_revenue" widget="monetary" sum="إجمالي الإيرادات"/>
+                                    <field name="subtotal_cost_budget" widget="monetary" sum="إجمالي موازنة التكلفة" optional="show"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_revenue_change" widget="monetary"/>
+                                <field name="total_cost_budget_change" widget="monetary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Variation Order Search View -->
+    <record id="view_contracting_variation_order_search" model="ir.ui.view">
+        <field name="name">contracting.variation.order.search</field>
+        <field name="model">contracting.variation.order</field>
+        <field name="arch" type="xml">
+            <search string="بحث أوامر الغيار">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="client_ref"/>
+                <field name="engineer_in_charge_id"/>
+                <separator/>
+                <filter string="المسودات" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="المقدمة للاعتماد" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="موافقة المهندس المقيم" name="engineer_approved" domain="[('state', '=', 'engineer_approved')]"/>
+                <filter string="المصادق عليها (معتمدة)" name="client_approved" domain="[('state', '=', 'client_approved')]"/>
+                <group>
+                    <filter string="المشروع" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="الحالة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="المهندس المقيم" name="group_by_engineer" domain="[]" context="{'group_by': 'engineer_in_charge_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Variation Order Action -->
+    <record id="action_contracting_variation_order" model="ir.actions.act_window">
+        <field name="name">أوامر الغيار (Variation Orders)</field>
+        <field name="res_model">contracting.variation.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_contracting_variation_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ أمر غيار هندسي جديد لتعديل كميات أو استحداث فقرات في جدول الكميات والتسعير!
+            </p>
+        </field>
+    </record>
+</odoo>

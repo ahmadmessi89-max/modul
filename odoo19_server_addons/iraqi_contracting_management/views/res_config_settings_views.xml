@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_contracting" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.contracting</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="70"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="إدارة المقاولات العراقية" string="إدارة المقاولات العراقية" name="iraqi_contracting_management">
+                    <block title="إعدادات الحسابات والمعالجة المالية للسلف والذرعات" name="contracting_accounting_settings">
+                        <setting id="retention_receivable_setting" string="أمانات الصيانة والاستقطاعات النظامية (رب العمل)" help="تحديد الحساب المالي لأمانات الصيانة المحتجزة لدى رب العمل في السلف المنجزة">
+                            <field name="retention_receivable_account_id"/>
+                        </setting>
+
+                        <setting id="retention_payable_setting" string="أمانات الصيانة الدائنة (المقاولين الثانويين)" help="تحديد الحساب المالي لأمانات الصيانة المحتجزة على المقاولين الثانويين">
+                            <field name="retention_payable_account_id"/>
+                        </setting>
+
+                        <setting id="tax_retention_payable_setting" string="حساب الأمانات الضريبية (الهيئة العامة للضرائب)" help="تحديد الحساب المالي للأمانات الضريبية المستقطعة من دفعات مقاولي الباطن">
+                            <field name="tax_retention_payable_account_id"/>
+                        </setting>
+
+                        <setting id="advance_payment_setting" string="حساب السلفة التشغيلية / الأولية" help="الحساب الوسيط لتسجيل السلفة التشغيلية الممنوحة واستردادها">
+                            <field name="advance_payment_account_id"/>
+                        </setting>
+
+                        <setting id="default_percents_setting" string="النسب الافتراضية للاستقطاعات" help="النسب الافتراضية المطبقة في الذرعات والسلف المنجزة">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label string="نسبة أمانات الصيانة الافتراضية (%)" for="contracting_retention_percent" class="col-lg-5 o_light_label"/>
+                                    <field name="contracting_retention_percent" class="col-lg-3"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="نسبة الاستقطاع الضريبي الافتراضية (%)" for="contracting_tax_deduction_percent" class="col-lg-5 o_light_label"/>
+                                    <field name="contracting_tax_deduction_percent" class="col-lg-3"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="نسبة استرداد السلفة التشغيلية (%)" for="contracting_advance_deduction_percent" class="col-lg-5 o_light_label"/>
+                                    <field name="contracting_advance_deduction_percent" class="col-lg-3"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+
+                    <block title="إعدادات الأبعاد التحليلية والرقابة على الموازنات" name="contracting_analytic_settings">
+                        <setting id="analytic_plans_setting" string="الخطط التحليلية ثلاثية الأبعاد" help="تحديد الخطط التحليلية المعتمدة لحسابات التكاليف الإنشائية">
+                            <div class="content-group">
+                                <div class="row mt8">
+                                    <label string="خطة المشاريع الإنشائية" for="analytic_plan_projects_id" class="col-lg-4 o_light_label"/>
+                                    <field name="analytic_plan_projects_id" class="col-lg-6"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="خطة حزم عمل جدول الكميات" for="analytic_plan_boq_packages_id" class="col-lg-4 o_light_label"/>
+                                    <field name="analytic_plan_boq_packages_id" class="col-lg-6"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label string="خطة عناصر التكلفة" for="analytic_plan_cost_elements_id" class="col-lg-4 o_light_label"/>
+                                    <field name="analytic_plan_cost_elements_id" class="col-lg-6"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_contracting_config_settings" model="ir.actions.act_window">
+        <field name="name">إعدادات إدارة المقاولات</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'iraqi_contracting_management'}</field>
+    </record>
+</odoo>

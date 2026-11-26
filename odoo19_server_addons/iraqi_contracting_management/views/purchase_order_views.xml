@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Purchase Order Form View for Iraqi Contracting Integration -->
+    <record id="view_purchase_order_form_contracting_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.contracting.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Project Field to Header/Sheet -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="project_id" placeholder="اختر المشروع الإنشائي لضبط رقابة الموازنة..."/>
+            </xpath>
+
+            <!-- Add BOQ & Cost Element Fields to PO Lines -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="before">
+                <field name="boq_id" domain="[('project_id', '=', parent.project_id)]" optional="show" placeholder="بند جدول الكميات"/>
+                <field name="package_id" optional="hide"/>
+                <field name="cost_element_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

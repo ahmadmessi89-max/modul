@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Site Material Delivery List View -->
+    <record id="view_contracting_site_delivery_tree" model="ir.ui.view">
+        <field name="name">contracting.site.delivery.list</field>
+        <field name="model">contracting.site.delivery</field>
+        <field name="arch" type="xml">
+            <list string="أذونات الإدخال المخزني الموقعي" decoration-info="state == 'draft'" decoration-warning="state == 'inspected'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="delivery_type"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="delivery_note_ref"/>
+                <field name="date"/>
+                <field name="receiving_engineer_id"/>
+                <field name="total_amount" widget="monetary" sum="إجمالي المواد المستلمة"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'inspected'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Site Material Delivery Form View -->
+    <record id="view_contracting_site_delivery_form" model="ir.ui.view">
+        <field name="name">contracting.site.delivery.form</field>
+        <field name="model">contracting.site.delivery</field>
+        <field name="arch" type="xml">
+            <form string="إذن إدخال مخزني موقعي">
+                <header>
+                    <button name="action_inspect" string="فحص موقعي ومطابقة المواصفات" type="object" invisible="state != 'draft'" class="btn-primary" groups="iraqi_contracting_management.group_contracting_site_engineer,iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_confirm" string="اعتماد الاستلام وتثبيت الرصيد" type="object" invisible="state != 'inspected'" class="btn-success" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_cancel" string="رفض الشحنة وإلغاء الإذن" type="object" invisible="state in ('confirmed', 'cancelled')" class="btn-danger"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state not in ('cancelled', 'inspected')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,inspected,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="رقم إذن الاستلام الموقعي"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="بيانات المشروع والتوريد">
+                            <field name="delivery_type" widget="radio" readonly="state == 'confirmed'"/>
+                            <field name="project_id" readonly="state == 'confirmed'"/>
+                            <field name="partner_id" readonly="state == 'confirmed'"/>
+                            <field name="purchase_order_id" readonly="state == 'confirmed'"/>
+                        </group>
+                        <group string="بيانات الوصل والمهندس المستلم">
+                            <field name="date" readonly="state == 'confirmed'"/>
+                            <field name="delivery_note_ref" readonly="state == 'confirmed'"/>
+                            <field name="warehouse_id" readonly="state == 'confirmed'"/>
+                            <field name="location_dest_id" readonly="state == 'confirmed'"/>
+                            <field name="picking_id" readonly="1"/>
+                            <field name="receiving_engineer_id" readonly="state == 'confirmed'"/>
+                            <field name="resident_engineer_id" readonly="state == 'confirmed'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="المواد والتجهيزات المستلمة في الموقع" name="items">
+                            <field name="line_ids" readonly="state == 'confirmed'">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="boq_id" domain="[('project_id', '=', parent.project_id)]"/>
+                                    <field name="cost_element_id" optional="show"/>
+                                    <field name="received_qty"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary" sum="الإجمالي"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_amount" widget="monetary"/>
+                            </group>
+                        </page>
+
+                        <page string="ملاحظات الفحص الفني والمختبري" name="quality">
+                            <field name="quality_notes" placeholder="سجل هنا نتائج الفحص البصري، شهادات المنشأ، أو نتائج تكسير مكعبات الخرسانة وفحص حديد التسليح..." readonly="state == 'confirmed'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Site Material Delivery Search View -->
+    <record id="view_contracting_site_delivery_search" model="ir.ui.view">
+        <field name="name">contracting.site.delivery.search</field>
+        <field name="model">contracting.site.delivery</field>
+        <field name="arch" type="xml">
+            <search string="بحث أذونات الإدخال الموقعي">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="delivery_note_ref"/>
+                <field name="receiving_engineer_id"/>
+                <separator/>
+                <filter string="المسودات" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="المفحوصة موقعياً" name="inspected" domain="[('state', '=', 'inspected')]"/>
+                <filter string="المعتمدة" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <group>
+                    <filter string="المشروع" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="المجهز / المورد" name="group_by_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="الحالة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="تاريخ الاستلام" name="group_by_date" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_contracting_site_delivery" model="ir.actions.act_window">
+        <field name="name">أذونات الإدخال المخزني الموقعي</field>
+        <field name="res_model">contracting.site.delivery</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_contracting_site_delivery_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                سجل أول إذن إدخال مخزني موقعي لمواد وتجهيزات المشروع الإنشائي!
+            </p>
+        </field>
+    </record>
+</odoo>

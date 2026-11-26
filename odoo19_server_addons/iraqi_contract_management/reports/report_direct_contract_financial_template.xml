@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_direct_contract_financial_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: 'Cairo', 'DejaVu Sans', sans-serif; font-size: 13px;">
+                        <div class="text-center mb-4 pb-2 border-bottom">
+                            <h2 style="color: #742a2a; font-weight: bold;">كشف المطابقة المالية والتكاليف والضمانات والغرامات</h2>
+                            <h4 style="color: #4a5568;"><span t-field="doc.contract_subject"/> (رقم العقد: <span t-field="doc.contract_number"/>)</h4>
+                        </div>
+
+                        <!-- Cost Summary -->
+                        <h4 style="color: #742a2a; border-bottom: 2px solid #742a2a; padding-bottom: 5px;">
+                            أولاً: تحليل التكاليف وهوامش الأرباح التقديرية
+                        </h4>
+                        <table class="table table-bordered table-sm mb-4">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%; background-color: #f7fafc;">كلفة المواد الأساسية:</td>
+                                    <td style="width: 20%;" class="text-end"><span t-field="doc.material_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td style="width: 30%; background-color: #f7fafc;">القيمة الإجمالية التعاقدية (الإحالة):</td>
+                                    <td style="width: 20%; font-weight: bold; color: #2b6cb0;" class="text-end"><span t-field="doc.contract_tender_value" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr t-if="not doc.is_local_supply">
+                                    <td style="background-color: #f7fafc;">كلفة الشحن والنقل الدولي:</td>
+                                    <td class="text-end"><span t-field="doc.shipping_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td style="background-color: #f7fafc;">كلفة التخليص الجمركي والفحص:</td>
+                                    <td class="text-end"><span t-field="doc.customs_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #f7fafc;">مصاريف إضافية وثانوية:</td>
+                                    <td class="text-end"><span t-field="doc.other_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td style="background-color: #f7fafc;">مصاريف مركز الكلفة المسجلة:</td>
+                                    <td class="text-end"><span t-field="doc.analytic_incurred_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr style="background-color: #edf2f7; font-weight: bold;">
+                                    <td>الكلفة التقديرية الإجمالية:</td>
+                                    <td class="text-end"><span t-field="doc.total_contract_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td>هامش الربح التقديري المتوقع:</td>
+                                    <td class="text-end" style="color: #276749;"><span t-field="doc.expected_profit_margin" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/> (<span t-field="doc.profit_percentage"/>%)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Delay Penalties & Tax Retentions -->
+                        <h4 style="color: #9b2c2c; border-bottom: 2px solid #9b2c2c; padding-bottom: 5px;" class="mt-4">
+                            ثانياً: موقف الغرامات التأخيرية والاستقطاعات الضريبية
+                        </h4>
+                        <table class="table table-bordered table-sm mb-4">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 25%; background-color: #fff5f5;"><strong>تاريخ التسليم الأصلي:</strong></td>
+                                    <td style="width: 25%;"><span t-field="doc.expected_delivery_date"/></td>
+                                    <td style="width: 25%; background-color: #fff5f5;"><strong>المدد التعويضية والتمديدات:</strong></td>
+                                    <td style="width: 25%;"><span t-field="doc.time_extension_days"/> يوم</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #fff5f5;"><strong>تاريخ التسليم بعد التمديد:</strong></td>
+                                    <td><span t-field="doc.adjusted_delivery_date"/></td>
+                                    <td style="background-color: #fff5f5;"><strong>أيام التأخير الفعلية:</strong></td>
+                                    <td><strong style="color: #e53e3e;"><span t-field="doc.delay_days"/> يوم</strong></td>
+                                </tr>
+                                <tr style="font-weight: bold; background-color: #fed7d7;">
+                                    <td style="color: #9b2c2c;">إجمالي الغرامة التأخيرية:</td>
+                                    <td style="color: #9b2c2c;" class="text-end"><span t-field="doc.total_penalty_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td style="color: #744210;">الأمانات الضريبية المحتجزة (<span t-field="doc.tax_retention_rate"/>%):</td>
+                                    <td style="color: #744210;" class="text-end"><span t-field="doc.tax_retention_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                                <tr style="font-weight: bold; background-color: #c6f6d5;">
+                                    <td colspan="3" style="color: #22543d; font-size: 14px;">صافي المستحقات المصروفة بعد خصم الغرامات:</td>
+                                    <td style="color: #22543d; font-size: 14px;" class="text-end"><span t-field="doc.net_contract_payout" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Payment Schedule -->
+                        <h4 style="color: #2b6cb0; border-bottom: 2px solid #2b6cb0; padding-bottom: 5px;" class="mt-4">
+                            ثالثاً: جدول الدفعات والتحصيل المالي
+                        </h4>
+                        <table class="table table-bordered table-sm text-center">
+                            <thead style="background-color: #2b6cb0; color: white;">
+                                <tr>
+                                    <th>تاريخ الاستحقاق</th>
+                                    <th>بيان الدفعة</th>
+                                    <th>النسبة</th>
+                                    <th>المبلغ المستحق</th>
+                                    <th>حالة الدفعة</th>
+                                    <th>تاريخ التسديد</th>
+                                    <th>رقم الإشعار / الصك</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.payment_schedule_ids" t-as="p">
+                                    <td><span t-field="p.due_date"/></td>
+                                    <td class="text-end"><span t-field="p.name"/></td>
+                                    <td><span t-field="p.percentage"/>%</td>
+                                    <td><span t-field="p.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td><span t-field="p.state"/></td>
+                                    <td><span t-field="p.actual_payment_date"/></td>
+                                    <td><span t-field="p.payment_reference"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5 text-center">
+                            <div class="col-4">
+                                <strong>المدقق المالي للعقود</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                            <div class="col-4">
+                                <strong>مدير الشؤون المالية والحسابات</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                            <div class="col-4">
+                                <strong>المصادقة والاعتماد</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

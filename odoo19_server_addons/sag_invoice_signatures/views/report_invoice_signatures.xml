@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Invoices & Bills Signature Template -->
+    <template id="report_invoice_document_signatures" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+            <div class="mt-4 pt-3" style="page-break-inside: avoid; border-top: 1px solid #dee2e6;">
+                <!-- Main 4 Signatures Row -->
+                <div class="row text-center" style="font-size: 13px; margin-top: 15px;">
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المحاسب</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Accountant</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدير المالي</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Financial Manager</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدقق</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Auditor</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدير المفوض أو من ينوب عنه</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Managing Director / Rep.</div>
+                    </div>
+                </div>
+
+                <!-- Recipient Block: Applies to Supplier Payments / Bills / Cash & Bank / Vouchers -->
+                <t t-if="o.move_type in ('in_invoice', 'in_refund', 'entry') or o.payment_id or o.journal_id.type in ('bank', 'cash')">
+                    <div class="row text-center mt-3 pt-2" style="font-size: 13px;">
+                        <div class="col-4 offset-4" style="border-top: 1px dashed #dee2e6; padding-top: 10px;">
+                            <div style="height: 45px;"><!-- Space for signature above title --></div>
+                            <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">مستلم المبلغ</div>
+                            <div style="color: #7f8c8d; font-size: 11px;">Payment Recipient</div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Payment Receipts / Vouchers Signature Template -->
+    <template id="report_payment_receipt_document_signatures" inherit_id="account.report_payment_receipt_document">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+            <div class="mt-4 pt-3" style="page-break-inside: avoid; border-top: 1px solid #dee2e6;">
+                <!-- Main 4 Signatures Row -->
+                <div class="row text-center" style="font-size: 13px; margin-top: 15px;">
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المحاسب</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Accountant</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدير المالي</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Financial Manager</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدقق</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Auditor</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">المدير المفوض أو من ينوب عنه</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Managing Director / Rep.</div>
+                    </div>
+                </div>
+
+                <!-- Recipient Block for Payment Receipts / Vouchers -->
+                <div class="row text-center mt-3 pt-2" style="font-size: 13px;">
+                    <div class="col-4 offset-4" style="border-top: 1px dashed #dee2e6; padding-top: 10px;">
+                        <div style="height: 45px;"><!-- Space for signature above title --></div>
+                        <div style="font-weight: bold; color: #2C3E50; font-size: 14px;">مستلم المبلغ</div>
+                        <div style="color: #7f8c8d; font-size: 11px;">Payment Recipient</div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

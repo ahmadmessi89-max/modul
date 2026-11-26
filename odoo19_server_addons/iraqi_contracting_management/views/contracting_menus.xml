@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top Level Menu: Iraqi Contracting Management -->
+    <menuitem id="menu_contracting_root"
+              name="إدارة المقاولات"
+              action="action_contracting_projects_dashboard"
+              web_icon="iraqi_contracting_management,static/description/icon.png"
+              groups="iraqi_contracting_management.group_contracting_site_engineer"
+              sequence="25"/>
+
+    <!-- 1. Projects & BOQ Category -->
+    <menuitem id="menu_contracting_projects_category"
+              name="المشاريع وجداول الكميات"
+              parent="menu_contracting_root"
+              sequence="10"/>
+
+    <menuitem id="menu_contracting_projects_dashboard_view"
+              name="لوحة متابعة المشاريع (تفاعلية)"
+              parent="menu_contracting_projects_category"
+              action="action_contracting_projects_dashboard"
+              sequence="5"/>
+
+    <menuitem id="menu_contracting_projects_view"
+              name="المشاريع الإنشائية"
+              parent="menu_contracting_projects_category"
+              action="action_contracting_projects_dashboard"
+              sequence="10"/>
+
+    <menuitem id="menu_contracting_residential_units_menu"
+              name="الوحدات والفلل السكنية (المجمعات)"
+              parent="menu_contracting_projects_category"
+              action="action_contracting_residential_unit"
+              sequence="15"/>
+
+    <menuitem id="menu_contracting_boq_list"
+              name="جدول الكميات والتسعير (BOQ)"
+              parent="menu_contracting_projects_category"
+              action="action_contracting_project_boq"
+              sequence="20"/>
+
+    <menuitem id="menu_contracting_boq_packages_menu"
+              name="حزم العمل (BOQ Packages)"
+              parent="menu_contracting_projects_category"
+              action="action_contracting_boq_package"
+              sequence="30"/>
+
+    <!-- 2. Subcontracts & IPCs Category (عقود الباطن والذرعات والسلف) -->
+    <menuitem id="menu_contracting_ipc_category"
+              name="العقود والذرعات والسلف"
+              parent="menu_contracting_root"
+              sequence="20"/>
+
+    <menuitem id="menu_contracting_subcontract_agreement_menu"
+              name="عقود مقاولي الباطن (Subcontracts)"
+              parent="menu_contracting_ipc_category"
+              action="action_contracting_subcontract_agreement"
+              sequence="5"/>
+
+    <menuitem id="menu_contracting_client_ipc_menu"
+              name="سلف رب العمل (Client IPCs)"
+              parent="menu_contracting_ipc_category"
+              action="action_contracting_client_ipc"
+              sequence="10"/>
+
+    <menuitem id="menu_contracting_subcontractor_ipc_menu"
+              name="ذرعات المقاولين الثانويين (Subcontractor IPCs)"
+              parent="menu_contracting_ipc_category"
+              action="action_contracting_subcontractor_ipc"
+              sequence="20"/>
+
+    <!-- 3. Variation Orders Category -->
+    <menuitem id="menu_contracting_variation_orders_category"
+              name="أوامر الغيار"
+              parent="menu_contracting_root"
+              sequence="25"/>
+
+    <menuitem id="menu_contracting_vo_list"
+              name="أوامر الغيار (Variation Orders)"
+              parent="menu_contracting_variation_orders_category"
+              action="action_contracting_variation_order"
+              sequence="10"/>
+
+    <!-- 4. Site Operations & Warehouses (مخازن المواقع والصرف) -->
+    <menuitem id="menu_contracting_site_operations_category"
+              name="العمليات الموقعية والمخازن"
+              parent="menu_contracting_root"
+              sequence="30"/>
+
+    <menuitem id="menu_contracting_site_delivery_menu"
+              name="إدخال مخزني موقعي (Site Deliveries)"
+              parent="menu_contracting_site_operations_category"
+              action="action_contracting_site_delivery"
+              sequence="10"/>
+
+    <menuitem id="menu_contracting_material_requisition_menu"
+              name="أذونات صرف المواد للأعمال (Material Requisitions)"
+              parent="menu_contracting_site_operations_category"
+              action="action_contracting_material_requisition"
+              sequence="15"/>
+
+    <menuitem id="menu_contracting_petty_cash_menu"
+              name="سلفة نقدية موقعية / ذمة المهندس (Petty Cash)"
+              parent="menu_contracting_site_operations_category"
+              action="action_contracting_petty_cash"
+              sequence="20"/>
+
+    <!-- 5. Cash Flow & Hotel Liquidity (التدفقات النقدية وإيرادات الفنادق) -->
+    <menuitem id="menu_contracting_finance_category"
+              name="التدفقات النقدية والسيولة"
+              parent="menu_contracting_root"
+              sequence="35"/>
+
+    <menuitem id="menu_contracting_cash_flow_menu"
+              name="متابعة وتوقعات التدفقات النقدية"
+              parent="menu_contracting_finance_category"
+              action="action_contracting_cash_flow"
+              sequence="10"/>
+
+    <menuitem id="menu_hotel_daily_revenue_menu"
+              name="كشوفات الإيرادات اليومية للفنادق"
+              parent="menu_contracting_finance_category"
+              action="action_hotel_daily_revenue"
+              sequence="20"/>
+
+    <!-- 6. Cost Control & Analytics Category -->
+    <menuitem id="menu_contracting_cost_control_category"
+              name="الرقابة والتكاليف التحليلية"
+              parent="menu_contracting_root"
+              sequence="40"/>
+
+    <menuitem id="menu_contracting_boq_analytics_menu"
+              name="متابعة وتحليل موازنات البنود"
+              parent="menu_contracting_cost_control_category"
+              action="action_contracting_project_boq"
+              sequence="10"/>
+
+    <menuitem id="menu_contracting_cost_elements_menu"
+              name="عناصر التكلفة الإنشائية"
+              parent="menu_contracting_cost_control_category"
+              action="action_contracting_cost_element"
+              sequence="20"/>
+
+    <!-- 7. Configuration Menu -->
+    <menuitem id="menu_contracting_config_category"
+              name="التهيئة والإعدادات"
+              parent="menu_contracting_root"
+              sequence="90"
+              groups="iraqi_contracting_management.group_contracting_financial_auditor,base.group_system"/>
+
+    <menuitem id="menu_contracting_settings_menu"
+              name="إعدادات الحسابات والأمانات"
+              parent="menu_contracting_config_category"
+              action="action_contracting_config_settings"
+              sequence="10"/>
+</odoo>

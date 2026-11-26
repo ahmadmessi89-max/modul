@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Document List View -->
+    <record id="view_direct_supply_document_list" model="ir.ui.view">
+        <field name="name">direct.supply.document.list</field>
+        <field name="model">direct.supply.document</field>
+        <field name="arch" type="xml">
+            <list string="مستندات وأرشيف العقود والمناقصات" decoration-info="doc_type == 'signed_contract'" decoration-success="doc_type in ('payment_receipt', 'tax_clearance')">
+                <field name="doc_date"/>
+                <field name="doc_number"/>
+                <field name="name"/>
+                <field name="doc_type"/>
+                <field name="contract_id"/>
+                <field name="attachment_count"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Document Form View -->
+    <record id="view_direct_supply_document_form" model="ir.ui.view">
+        <field name="name">direct.supply.document.form</field>
+        <field name="model">direct.supply.document</field>
+        <field name="arch" type="xml">
+            <form string="مستند / وثيقة العقد والمناقصة">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="عنوان / اسم المستند"/>
+                        <h1>
+                            <field name="name" placeholder="مثال: كتاب الإحالة والمصادقة، العقد الموقع، بوليصة الشحن، براءة الذمة الضريبية..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="بيانات الوثيقة">
+                            <field name="contract_id"/>
+                            <field name="doc_type"/>
+                            <field name="doc_number" placeholder="مثال: ق/2026/145"/>
+                            <field name="doc_date"/>
+                        </group>
+                        <group string="الملفات والمرفقات">
+                            <field name="attachment_ids" widget="many2many_binary" string="رفع المرفقات"/>
+                        </group>
+                    </group>
+                    <group string="تفاصيل وبيان المستند">
+                        <field name="notes" placeholder="أية ملاحظات فنية أو إدارية تخص هذا الكتاب أو المستند..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Document Search View -->
+    <record id="view_direct_supply_document_search" model="ir.ui.view">
+        <field name="name">direct.supply.document.search</field>
+        <field name="model">direct.supply.document</field>
+        <field name="arch" type="xml">
+            <search string="بحث المستندات">
+                <field name="name"/>
+                <field name="doc_number"/>
+                <field name="contract_id"/>
+                <field name="doc_type"/>
+                <group>
+                    <filter string="نوع المستند" name="group_by_doc_type" domain="[]" context="{'group_by': 'doc_type'}"/>
+                    <filter string="العقد المرتبط" name="group_by_contract" domain="[]" context="{'group_by': 'contract_id'}"/>
+                    <filter string="تاريخ الوثيقة" name="group_by_date" domain="[]" context="{'group_by': 'doc_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Document Action -->
+    <record id="action_direct_supply_document" model="ir.actions.act_window">
+        <field name="name">أرشيف ومستندات العقود</field>
+        <field name="res_model">direct.supply.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_direct_supply_document_search"/>
+    </record>
+</odoo>

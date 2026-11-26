@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_direct_contract_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: 'Cairo', 'DejaVu Sans', sans-serif; font-size: 13px;">
+                        <div class="text-center mb-4 pb-2 border-bottom">
+                            <h2 style="color: #1a365d; font-weight: bold;">جمهورية العراق</h2>
+                            <h3 style="color: #2b6cb0; font-weight: bold;">وثيقة عقد التجهيز المباشر والمقاولة</h3>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span><strong>رمز العقد: </strong><span t-field="doc.name"/></span>
+                                <span><strong>رقم العقد المعتمد: </strong><span t-field="doc.contract_number"/></span>
+                                <span><strong>تاريخ التوقيع: </strong><span t-field="doc.contract_date"/></span>
+                            </div>
+                        </div>
+
+                        <!-- Basic Details Grid -->
+                        <table class="table table-bordered table-sm mb-4">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 20%; background-color: #edf2f7;"><strong>الجهة المستفيدة:</strong></td>
+                                    <td style="width: 30%;"><span t-field="doc.beneficiary_id.name"/></td>
+                                    <td style="width: 20%; background-color: #edf2f7;"><strong>الجهة الموردة (المجهز):</strong></td>
+                                    <td style="width: 30%;"><span t-field="doc.vendor_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>موضوع العقد:</strong></td>
+                                    <td colspan="3"><span t-field="doc.contract_subject"/></td>
+                                </tr>
+                                <tr t-if="doc.tender_id">
+                                    <td style="background-color: #edf2f7;"><strong>المناقصة المرتبطة:</strong></td>
+                                    <td colspan="3"><span t-field="doc.tender_id.tender_title"/> (رقم: <span t-field="doc.tender_id.tender_number"/>)</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>القسم المسؤول:</strong></td>
+                                    <td><span t-field="doc.department_id.name"/></td>
+                                    <td style="background-color: #edf2f7;"><strong>الموظف المسؤول:</strong></td>
+                                    <td><span t-field="doc.responsible_user_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>تاريخ التسليم التعاقدي:</strong></td>
+                                    <td><span t-field="doc.expected_delivery_date"/></td>
+                                    <td style="background-color: #edf2f7;"><strong>موقف الإنجاز:</strong></td>
+                                    <td><span t-field="doc.progress_percentage"/>% (<span t-field="doc.state"/>)</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>القيمة التعاقدية الإجمالية:</strong></td>
+                                    <td colspan="3" style="font-size: 15px; color: #2b6cb0;">
+                                        <strong><span t-field="doc.contract_tender_value" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Material Line Items -->
+                        <h4 style="color: #2b6cb0; border-bottom: 2px solid #2b6cb0; padding-bottom: 5px;" class="mt-3">
+                            جدول المواد والأصناف المتعاقد على تجهيزها
+                        </h4>
+                        <table class="table table-bordered table-striped table-sm text-center mt-2">
+                            <thead style="background-color: #2b6cb0; color: white;">
+                                <tr>
+                                    <th style="width: 5%;">ت</th>
+                                    <th style="width: 45%;">المواصفات الفنية وتفاصيل المادة</th>
+                                    <th style="width: 10%;">الكمية</th>
+                                    <th style="width: 10%;">الوحدة</th>
+                                    <th style="width: 15%;">سعر الوحدة</th>
+                                    <th style="width: 15%;">الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="idx" t-value="1"/>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td><t t-esc="idx"/></td>
+                                    <td class="text-end"><span t-field="line.name"/></td>
+                                    <td><span t-field="line.quantity"/></td>
+                                    <td><span t-field="line.uom_id.name"/></td>
+                                    <td><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <t t-set="idx" t-value="idx + 1"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: #edf2f7; font-weight: bold;">
+                                    <td colspan="5" class="text-end">إجمالي كلفة المواد:</td>
+                                    <td><span t-field="doc.material_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Bank Guarantees Summary -->
+                        <div t-if="doc.has_performance_bond" class="mt-4 p-3 border rounded bg-light">
+                            <strong>خطاب ضمان حسن التنفيذ (5%): </strong>
+                            رقم <span t-field="doc.performance_bond_number"/> صادر من <span t-field="doc.performance_bond_bank"/> بمبلغ <span t-field="doc.performance_bond_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/> ساري لغاية <span t-field="doc.performance_bond_expiry"/>.
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5 pt-4 text-center">
+                            <div class="col-4">
+                                <strong>مسؤول التجهيز والمتابعة</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                            <div class="col-4">
+                                <strong>مدير القسم المعني</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                            <div class="col-4">
+                                <strong>المدير المفوض / المصادقة</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

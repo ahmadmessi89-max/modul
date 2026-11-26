@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_tender_evaluation_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: 'Cairo', 'DejaVu Sans', sans-serif; font-size: 13px;">
+                        <div class="text-center mb-4 pb-2 border-bottom">
+                            <h2 style="color: #1a365d; font-weight: bold;"><span t-field="doc.company_id.name"/></h2>
+                            <h3 style="color: #2b6cb0; font-weight: bold;">تقرير موقف فتح العطاءات وتحليل المنافسين والإحالة</h3>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span><strong>رمز المناقصة: </strong><span t-field="doc.name"/></span>
+                                <span><strong>رقم المناقصة: </strong><span t-field="doc.tender_number"/></span>
+                                <span><strong>الجهة المعلنة: </strong><span t-field="doc.beneficiary_id.name"/></span>
+                            </div>
+                        </div>
+
+                        <!-- Our Offer Summary -->
+                        <table class="table table-bordered table-sm mb-4">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 25%; background-color: #edf2f7;"><strong>موضوع المناقصة:</strong></td>
+                                    <td colspan="3"><span t-field="doc.tender_title"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>مبلغ عطائنا المقدم:</strong></td>
+                                    <td style="font-weight: bold; color: #2b6cb0;">
+                                        <span t-field="doc.total_bid_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td style="background-color: #edf2f7;"><strong>ترتيبنا بين المنافسين:</strong></td>
+                                    <td style="font-weight: bold;"><span t-field="doc.our_rank"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #edf2f7;"><strong>موقف الإحالة:</strong></td>
+                                    <td colspan="3" style="font-weight: bold;">
+                                        <t t-if="doc.is_won">
+                                            <span style="color: #38a169;">فوز بالعطاء والإحالة لصالحنا بموجب الكتاب (<span t-field="doc.award_letter_number"/>) بتاريخ (<span t-field="doc.award_letter_date"/>)</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span style="color: #e53e3e;">لم نحظَ بالإحالة - السبب: <span t-field="doc.lost_reason"/></span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Competitors Table -->
+                        <h4 style="color: #2b6cb0; border-bottom: 2px solid #2b6cb0; padding-bottom: 5px;">
+                            أسعار وعطاءات الشركات المنافسة عند فتح المظاريف
+                        </h4>
+                        <table class="table table-bordered table-striped table-sm text-center mt-2">
+                            <thead style="background-color: #2b6cb0; color: white;">
+                                <tr>
+                                    <th style="width: 10%;">الترتيب</th>
+                                    <th style="width: 35%;">اسم الشركة / المنافس</th>
+                                    <th style="width: 20%;">مبلغ العطاء المقدم</th>
+                                    <th style="width: 15%;">الكفالة المصرفية</th>
+                                    <th style="width: 20%;">الموقف الفني / الإحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.competitor_ids" t-as="comp" t-att-style="comp.is_awarded and 'background-color: #c6f6d5;' or ''">
+                                    <td><span t-field="comp.financial_rank"/></td>
+                                    <td class="text-end"><span t-field="comp.partner_id.name"/></td>
+                                    <td style="font-weight: bold;"><span t-field="comp.bid_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    <td><t t-if="comp.has_bid_bond">مقدمة</t><t t-else="">غير مقدمة</t></td>
+                                    <td>
+                                        <t t-if="comp.is_awarded">
+                                            <strong style="color: #22543d;">محال عليها</strong>
+                                        </t>
+                                        <t t-else="">
+                                            <span t-field="comp.technical_compliance"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Loss Analysis or Award Notes -->
+                        <div t-if="doc.lost_notes" class="mt-4 p-3 border rounded bg-light">
+                            <strong>ملاحظات وتقييم أسباب عدم الفوز والدروس المستفادة:</strong>
+                            <div t-field="doc.lost_notes"/>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5 text-center">
+                            <div class="col-6">
+                                <strong>مهندس التسعير</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>المدير العام / المدير التجاري</strong><br/><br/>
+                                <span>....................................</span>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

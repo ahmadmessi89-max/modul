@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. Analytic Plan: Projects Plan (خطة المشاريع الإنشائية) -->
+        <record id="analytic_plan_projects" model="account.analytic.plan">
+            <field name="name">1. خطة المشاريع الإنشائية (Projects Plan)</field>
+            <field name="description">البُعد الأول: تتبع التكاليف والإيرادات على مستوى المشروع الإنشائي</field>
+        </record>
+
+        <!-- 2. Analytic Plan: BOQ Work Packages (خطة حزم العمل وجدول الكميات) -->
+        <record id="analytic_plan_boq_packages" model="account.analytic.plan">
+            <field name="name">2. خطة حزم العمل (BOQ Packages Plan)</field>
+            <field name="description">البُعد الثاني: تتبع بنود وحزم جدول الكميات والأعمال التخصصية</field>
+        </record>
+
+        <!-- 3. Analytic Plan: Cost Elements (خطة عناصر التكلفة) -->
+        <record id="analytic_plan_cost_elements" model="account.analytic.plan">
+            <field name="name">3. خطة عناصر التكلفة (Cost Elements Plan)</field>
+            <field name="description">البُعد الثالث: التبويب النوعي للتكاليف (مواد، مقاولين ثانويين، آليات، أجور يوميات)</field>
+        </record>
+
+        <!-- Standard Cost Elements (عناصر التكلفة المعيارية للمقاولات في العراق) -->
+        <record id="cost_element_materials" model="contracting.cost.element">
+            <field name="name">مواد خامات وتجهيزات موقعية (Materials)</field>
+            <field name="code">MAT</field>
+            <field name="description">الإسمنت، حديد التسليح، الرمل والحصى، الطابوق، الأنابيب، الكابلات، ومواد الإنهاءات</field>
+        </record>
+
+        <record id="cost_element_subcontractors" model="contracting.cost.element">
+            <field name="name">مقاولين ثانويين (Subcontractors)</field>
+            <field name="code">SUB</field>
+            <field name="description">مقاولات النجارة والحدادة، أعمال الدكتات والتبريد، مقاولات الصبغ والإنهاءات</field>
+        </record>
+
+        <record id="cost_element_machinery" model="contracting.cost.element">
+            <field name="name">آليات ومعدات موقعية (Equipment &amp; Machinery)</field>
+            <field name="code">EQP</field>
+            <field name="description">الحفارات، التناكر، خباطات ومضخات الكونكريت، الرافعات البرجية، المولدات</field>
+        </record>
+
+        <record id="cost_element_direct_labor" model="contracting.cost.element">
+            <field name="name">أجور يوميات عمال الموقع (Direct Labor &amp; Site Wages)</field>
+            <field name="code">LAB</field>
+            <field name="description">يوميات العمالة المباشرة، الخلفات، المياومة الموقعين، وإشراف المهندسين</field>
+        </record>
+
+        <!-- Standard BOQ Packages (حزم العمل المعيارية) -->
+        <record id="boq_pkg_earthwork_foundations" model="contracting.boq.package">
+            <field name="name">أعمال ترابية وأساسات (Earthworks &amp; Foundations)</field>
+            <field name="code">PKG-01</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="boq_pkg_concrete_structures" model="contracting.boq.package">
+            <field name="name">هياكل كونكريتية مسلحة (Concrete Structures)</field>
+            <field name="code">PKG-02</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="boq_pkg_finishes_architectural" model="contracting.boq.package">
+            <field name="name">إنهاءات ومعمارية (Finishes &amp; Architectural)</field>
+            <field name="code">PKG-03</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="boq_pkg_mep" model="contracting.boq.package">
+            <field name="name">كهروميكانيك (MEP - Mechanical &amp; Electrical)</field>
+            <field name="code">PKG-04</field>
+            <field name="sequence">40</field>
+        </record>
+    </data>
+</odoo>

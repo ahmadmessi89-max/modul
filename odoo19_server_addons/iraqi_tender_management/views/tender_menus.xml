@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top Level Menu: Iraqi Tender Participation & Bidding -->
+    <menuitem id="menu_iraqi_tender_root"
+              name="إدارة المناقصات والعطاءات"
+              web_icon="iraqi_tender_management,static/description/icon.png"
+              groups="iraqi_tender_management.group_iraqi_tender_user"
+              sequence="27"/>
+
+    <!-- 1. Tenders & Bidding Category -->
+    <menuitem id="menu_iraqi_tender_category"
+              name="المناقصات والعطاءات"
+              parent="menu_iraqi_tender_root"
+              sequence="10"/>
+
+    <menuitem id="menu_iraqi_tender_announcements_all"
+              name="كافة المناقصات المشارك بها"
+              parent="menu_iraqi_tender_category"
+              action="action_iraqi_tender_announcement_all"
+              sequence="10"/>
+
+    <menuitem id="menu_iraqi_tender_pricing_menu"
+              name="دراسة وتسعير العطاءات (مسودات)"
+              parent="menu_iraqi_tender_category"
+              action="action_iraqi_tender_pricing"
+              sequence="20"/>
+
+    <menuitem id="menu_iraqi_tender_submitted_menu"
+              name="العطاءات المقدمة والمفتوحة"
+              parent="menu_iraqi_tender_category"
+              action="action_iraqi_tender_submitted"
+              sequence="30"/>
+
+    <menuitem id="menu_iraqi_tender_won_menu"
+              name="العطاءات الفائزة بالإحالة"
+              parent="menu_iraqi_tender_category"
+              action="action_iraqi_tender_won"
+              sequence="40"/>
+</odoo>

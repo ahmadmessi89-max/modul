@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_move_auditor,account.move.auditor,account.model_account_move,codex_invoice_approvals.group_approval_auditor,1,1,0,0
+access_account_move_director,account.move.director,account.model_account_move,codex_invoice_approvals.group_approval_managing_director,1,1,0,0
+access_account_move_line_auditor,account.move.line.auditor,account.model_account_move_line,codex_invoice_approvals.group_approval_auditor,1,1,0,0
+access_account_move_line_director,account.move.line.director,account.model_account_move_line,codex_invoice_approvals.group_approval_managing_director,1,1,0,0

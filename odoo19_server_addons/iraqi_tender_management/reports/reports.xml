@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Tender Participation & BOQ Pricing Study Report -->
+    <record id="action_report_iraqi_tender_announcement" model="ir.actions.report">
+        <field name="name">استمارة دراسة وتسعير العطاء وجدول الكميات</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_tender_management.report_tender_announcement_template</field>
+        <field name="report_file">iraqi_tender_management.report_tender_announcement_template</field>
+        <field name="print_report_name">'دراسة عطاء - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_iraqi_tender_announcement"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- 2. Tender Competitor & Position Analysis Report -->
+    <record id="action_report_iraqi_tender_evaluation" model="ir.actions.report">
+        <field name="name">كشف تحليل موقف العطاء والمنافسين والإحالة</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_tender_management.report_tender_evaluation_template</field>
+        <field name="report_file">iraqi_tender_management.report_tender_evaluation_template</field>
+        <field name="print_report_name">'موقف العطاء والمنافسين - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_iraqi_tender_announcement"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

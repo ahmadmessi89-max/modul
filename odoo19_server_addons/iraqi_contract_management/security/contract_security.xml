@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Security Category -->
+        <record id="module_category_iraqi_contracts" model="ir.module.category">
+            <field name="name">إدارة العقود والتجهيز المباشر</field>
+            <field name="description">صلاحيات إدارة العقود والتجهيز المباشر وخطابات الضمان والمطابقة المالية</field>
+            <field name="sequence">44</field>
+        </record>
+
+        <!-- Privilege for Odoo 19 Groups -->
+        <record id="res_groups_privilege_iraqi_contract" model="res.groups.privilege">
+            <field name="name">إدارة العقود والتجهيز</field>
+            <field name="sequence">10</field>
+            <field name="category_id" ref="module_category_iraqi_contracts"/>
+        </record>
+
+        <!-- User Groups -->
+        <!-- 1. Contract & Supply Officer -->
+        <record id="group_iraqi_contract_user" model="res.groups">
+            <field name="name">موظف العقود والتجهيز (Contract Officer)</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_iraqi_contract"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">يستطيع تسجيل العقود، متابعة مراحل التجهيز، تسجيل استلام المواد، ورفع المرفقات.</field>
+        </record>
+
+        <!-- 2. Contracts Manager -->
+        <record id="group_iraqi_contract_manager" model="res.groups">
+            <field name="name">مدير العقود والتجهيز (Contracts Manager)</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_iraqi_contract"/>
+            <field name="implied_ids" eval="[(4, ref('group_iraqi_contract_user'))]"/>
+            <field name="comment">يستطيع اعتماد العقود، المصادقة على خطابات الضمان، إصدار أوامر التمديد، والمصادقة على الاستلام الأولي والنهائي.</field>
+        </record>
+
+        <!-- 3. Contract Financial Auditor -->
+        <record id="group_iraqi_contract_auditor" model="res.groups">
+            <field name="name">المدقق المالي للعقود (Contract Financial Auditor)</field>
+            <field name="sequence">30</field>
+            <field name="privilege_id" ref="res_groups_privilege_iraqi_contract"/>
+            <field name="implied_ids" eval="[(4, ref('group_iraqi_contract_manager'))]"/>
+            <field name="comment">يستطيع تدقيق الكلف والمصروفات التحليلية واحتساب الغرامات التأخيرية والأمانات الضريبية وجدول الدفعات.</field>
+        </record>
+
+        <!-- Admin Access -->
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_iraqi_contract_auditor'))]"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- Multi-Company Rule -->
+        <record id="direct_supply_contract_multi_company_rule" model="ir.rule">
+            <field name="name">Direct Supply Contract Multi-Company</field>
+            <field name="model_id" ref="model_direct_supply_contract"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

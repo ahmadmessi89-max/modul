@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cash Flow List View -->
+    <record id="view_contracting_cash_flow_list" model="ir.ui.view">
+        <field name="name">contracting.cash.flow.list</field>
+        <field name="model">contracting.cash.flow</field>
+        <field name="arch" type="xml">
+            <list string="التدفقات النقدية للمشاريع والمجموعة">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_inflows" widget="monetary" sum="إجمالي المقبوضات"/>
+                <field name="total_outflows" widget="monetary" sum="إجمالي المدفوعات"/>
+                <field name="net_cash_flow" widget="monetary" sum="صافي السيولة"/>
+                <field name="liquidity_status" widget="badge" decoration-success="liquidity_status == 'surplus'" decoration-info="liquidity_status == 'balanced'" decoration-danger="liquidity_status == 'deficit'"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Cash Flow Form View -->
+    <record id="view_contracting_cash_flow_form" model="ir.ui.view">
+        <field name="name">contracting.cash.flow.form</field>
+        <field name="model">contracting.cash.flow</field>
+        <field name="arch" type="xml">
+            <form string="كشف التدفق النقدي">
+                <header>
+                    <button name="action_auto_fill_from_system" string="تحديث تلقائي من النظام" type="object" class="btn-info" icon="fa-refresh" invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="اعتماد الكشف" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_close" string="إقفال ومطابقة" type="object" class="btn-success" invisible="state != 'confirmed'"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state not in ['confirmed', 'closed']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="بيان وفترة التدفق النقدي"/>
+                        <h1><field name="name" placeholder="مثال: التدفق النقدي التقديري - الربع الرابع 2026"/></h1>
+                    </div>
+                    <group>
+                        <group string="نطاق الكشف">
+                            <field name="project_id" placeholder="فارغ = كشف مجمع لكافة المشاريع"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="الموقف المالي وصافي السيولة">
+                            <field name="net_cash_flow" widget="monetary" style="font-size: 1.4em; font-weight: bold;"/>
+                            <field name="liquidity_status" widget="badge"/>
+                            <field name="action_recommendation" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card p-3 border-success">
+                                <h4 class="text-success"><i class="fa fa-arrow-down"/> المقبوضات المتوقعة (Cash Inflows)</h4>
+                                <group>
+                                    <field name="inflow_client_ipcs" widget="monetary"/>
+                                    <field name="inflow_unit_sales" widget="monetary"/>
+                                    <field name="inflow_hotel_transfers" widget="monetary"/>
+                                    <field name="inflow_other" widget="monetary"/>
+                                    <field name="total_inflows" widget="monetary" class="oe_subtotal_footer_separator" style="font-size: 1.2em; font-weight: bold; color: #2e7d32;"/>
+                                </group>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-3 border-danger">
+                                <h4 class="text-danger"><i class="fa fa-arrow-up"/> المدفوعات والالتزامات (Cash Outflows)</h4>
+                                <group>
+                                    <field name="outflow_subcontractors" widget="monetary"/>
+                                    <field name="outflow_suppliers" widget="monetary"/>
+                                    <field name="outflow_site_petty_cash" widget="monetary"/>
+                                    <field name="outflow_salaries_wages" widget="monetary"/>
+                                    <field name="outflow_other" widget="monetary"/>
+                                    <field name="total_outflows" widget="monetary" class="oe_subtotal_footer_separator" style="font-size: 1.2em; font-weight: bold; color: #c62828;"/>
+                                </group>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Cash Flow Action -->
+    <record id="action_contracting_cash_flow" model="ir.actions.act_window">
+        <field name="name">متابعة وتوقعات التدفقات النقدية</field>
+        <field name="res_model">contracting.cash.flow</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                قم بإنشاء كشف تدفق نقدي لمراقبة السيولة ومطابقة مقبوضات السلف وإيراد الفنادق مع التزامات المقاولين!
+            </p>
+        </field>
+    </record>
+</odoo>

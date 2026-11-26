@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Direct Supply Contract Kanban View -->
+    <record id="view_direct_supply_contract_kanban" model="ir.ui.view">
+        <field name="name">direct.supply.contract.kanban</field>
+        <field name="model">direct.supply.contract</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" sample="1">
+                <field name="name"/>
+                <field name="contract_number"/>
+                <field name="contract_subject"/>
+                <field name="beneficiary_id"/>
+                <field name="vendor_id"/>
+                <field name="contract_tender_value"/>
+                <field name="currency_id"/>
+                <field name="progress_percentage"/>
+                <field name="state"/>
+                <field name="delay_days"/>
+                <field name="tender_id"/>
+                <field name="expected_delivery_date"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong class="text-primary font-weight-bold"><field name="name"/></strong>
+                            <span class="badge rounded-pill bg-dark text-white"><field name="contract_number"/></span>
+                        </div>
+                        <div class="mb-2">
+                            <h5 class="fw-bold mb-1 text-truncate"><field name="contract_subject"/></h5>
+                            <div class="text-muted small"><field name="beneficiary_id"/></div>
+                            <div class="text-muted small"><field name="vendor_id"/></div>
+                            <t t-if="record.tender_id.raw_value">
+                                <span class="badge bg-info text-white small mt-1"><i class="fa fa-gavel me-1"/> مناقصة: <field name="tender_id"/></span>
+                            </t>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center my-2 py-1 border-top border-bottom">
+                            <div>
+                                <span class="text-muted small">قيمة العقد:</span>
+                                <div class="fw-bold text-success"><field name="contract_tender_value" widget="monetary"/></div>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted small">التسليم:</span>
+                                <div class="fw-bold"><field name="expected_delivery_date"/></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>نسبة الإنجاز</span>
+                                <span class="fw-bold"><field name="progress_percentage"/>%</span>
+                            </div>
+                            <field name="progress_percentage" widget="progressbar"/>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2 pt-1 border-top">
+                            <t t-if="record.delay_days.raw_value > 0">
+                                <span class="badge bg-danger">تأخير: <field name="delay_days"/> يوم</span>
+                            </t>
+                            <t t-else="">
+                                <span class="badge bg-success">ضمن المدة</span>
+                            </t>
+                            <field name="responsible_user_id" widget="many2one_avatar_user"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Direct Supply Contract List View -->
+    <record id="view_direct_supply_contract_list" model="ir.ui.view">
+        <field name="name">direct.supply.contract.list</field>
+        <field name="model">direct.supply.contract</field>
+        <field name="arch" type="xml">
+            <list string="عقود التجهيز المباشر والمقاولات" decoration-info="state in ('signed', 'guarantee_deposited', 'sourcing')" decoration-warning="state in ('shipping', 'clearance', 'site_delivery')" decoration-success="state in ('completed', 'provisional_acceptance', 'final_acceptance')" decoration-danger="delay_days > 0 and state != 'completed'">
+                <field name="name"/>
+                <field name="contract_number"/>
+                <field name="contract_subject"/>
+                <field name="tender_id" optional="show"/>
+                <field name="beneficiary_id"/>
+                <field name="vendor_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="responsible_user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="contract_date" optional="hide"/>
+                <field name="expected_delivery_date"/>
+                <field name="adjusted_delivery_date" optional="hide"/>
+                <field name="contract_tender_value" widget="monetary" sum="إجمالي القيمة التعاقدية"/>
+                <field name="total_contract_cost" widget="monetary" sum="إجمالي الكلفة التقديرية" optional="show"/>
+                <field name="expected_profit_margin" widget="monetary" sum="إجمالي الأرباح المتوقعة" optional="show"/>
+                <field name="delay_days" optional="show"/>
+                <field name="total_penalty_amount" widget="monetary" optional="hide"/>
+                <field name="progress_percentage" widget="progressbar"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft', 'signed', 'guarantee_deposited')" decoration-warning="state in ('sourcing', 'shipping', 'clearance', 'site_delivery')" decoration-success="state in ('completed', 'provisional_acceptance', 'final_acceptance')" decoration-danger="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Direct Supply Contract Form View -->
+    <record id="view_direct_supply_contract_form" model="ir.ui.view">
+        <field name="name">direct.supply.contract.form</field>
+        <field name="model">direct.supply.contract</field>
+        <field name="arch" type="xml">
+            <form string="عقد التجهيز المباشر">
+                <header>
+                    <button name="action_sign" string="توقيع وإبرام العقد" type="object" invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_guarantee_deposited" string="تأكيد إيداع خطابات الضمان" type="object" invisible="state != 'signed'" class="btn-primary"/>
+                    <button name="action_sourcing" string="بدء التعاقد وأمر الشراء" type="object" invisible="state != 'guarantee_deposited'" class="btn-primary"/>
+                    <button name="action_shipping" string="بدء الشحن والتوريد" type="object" invisible="state != 'sourcing'" class="btn-primary"/>
+                    <button name="action_clearance" string="بدء التخليص والفحص" type="object" invisible="state != 'shipping' or is_local_supply" class="btn-primary"/>
+                    <button name="action_site_delivery" string="التجهيز والتوريد للموقع" type="object" invisible="state not in ('clearance', 'shipping') or (state == 'shipping' and not is_local_supply)" class="btn-primary"/>
+                    <button name="action_provisional_acceptance" string="الاستلام الأولي والمطابقة" type="object" invisible="state != 'site_delivery'" class="btn-success"/>
+                    <button name="action_final_acceptance" string="الاستلام النهائي وإطلاق الضمان" type="object" invisible="state != 'provisional_acceptance'" class="btn-success"/>
+                    <button name="action_complete" string="إغلاق العقد وتسديده بالكامل" type="object" invisible="state != 'final_acceptance'" class="btn-success"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state in ('draft', 'completed')" class="btn-secondary"/>
+                    <button name="action_cancel" string="إلغاء العقد" type="object" invisible="state in ('completed', 'cancelled')" class="btn-danger"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,signed,guarantee_deposited,shipping,site_delivery,provisional_acceptance,final_acceptance,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_tender" type="object" class="oe_stat_button" icon="fa-gavel" invisible="not tender_id">
+                            <span class="o_stat_text">المناقصة المرتبطة</span>
+                        </button>
+                        <button name="action_view_documents" type="object" class="oe_stat_button" icon="fa-files-o">
+                            <field name="document_count" widget="statinfo" string="المستندات والمرفقات"/>
+                        </button>
+                        <button name="action_view_analytic_lines" type="object" class="oe_stat_button" icon="fa-line-chart" invisible="not analytic_account_id">
+                            <field name="analytic_incurred_cost" widget="statinfo" string="مصاريف مركز الكلفة"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="منجز ومسدد" bg_color="text-bg-success" invisible="state != 'completed'"/>
+                    <widget name="web_ribbon" title="متأخر عن التسليم" bg_color="text-bg-danger" invisible="delay_days == 0 or state in ('draft', 'completed', 'cancelled')"/>
+
+                    <div class="oe_title">
+                        <span class="o_form_label">رمز العقد التسلسلي</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="بيانات العقد والجهات التعاقدية">
+                            <field name="contract_number" placeholder="مثال: م/2026/ع-89"/>
+                            <field name="contract_subject" placeholder="موضوع ونطاق التجهيز..."/>
+                            <field name="tender_id"/>
+                            <field name="beneficiary_id"/>
+                            <field name="vendor_id"/>
+                            <field name="is_local_supply"/>
+                        </group>
+                        <group string="المسؤوليات والتواريخ وجداول التنفيذ">
+                            <field name="department_id"/>
+                            <field name="responsible_user_id"/>
+                            <field name="contract_date"/>
+                            <field name="expected_delivery_date"/>
+                            <field name="time_extension_days"/>
+                            <field name="adjusted_delivery_date"/>
+                            <field name="actual_delivery_date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="analytic_precision" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- Tab 1: Material Items -->
+                        <page string="بنود المواد والتجهيز" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary"/>
+                                    <field name="delivered_quantity"/>
+                                    <field name="remaining_quantity"/>
+                                    <field name="delivery_status" widget="badge" decoration-success="delivery_status == 'delivered'" decoration-warning="delivery_status == 'partial'" decoration-muted="delivery_status == 'pending'"/>
+                                    <field name="notes" optional="show"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="material_cost" widget="monetary"/>
+                            </group>
+                        </page>
+
+                        <!-- Tab 2: Bank Guarantees -->
+                        <page string="خطابات الضمان المصرفية (الكفالات)" name="guarantees">
+                            <group>
+                                <group string="1. خطاب ضمان حسن التنفيذ (Performance Bond 5%)">
+                                    <field name="has_performance_bond"/>
+                                    <field name="performance_bond_number" invisible="not has_performance_bond"/>
+                                    <field name="performance_bond_bank" invisible="not has_performance_bond"/>
+                                    <field name="performance_bond_amount" widget="monetary" invisible="not has_performance_bond"/>
+                                    <field name="performance_bond_expiry" invisible="not has_performance_bond"/>
+                                    <field name="performance_bond_status" widget="badge" invisible="not has_performance_bond"/>
+                                </group>
+                                <group string="2. خطاب ضمان السلفة التشغيلية (Advance Bond 10%)">
+                                    <field name="has_advance_payment_bond"/>
+                                    <field name="advance_bond_number" invisible="not has_advance_payment_bond"/>
+                                    <field name="advance_bond_bank" invisible="not has_advance_payment_bond"/>
+                                    <field name="advance_bond_amount" widget="monetary" invisible="not has_advance_payment_bond"/>
+                                    <field name="advance_bond_expiry" invisible="not has_advance_payment_bond"/>
+                                    <field name="advance_bond_status" widget="badge" invisible="not has_advance_payment_bond"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 3: Cost Structure & Financial Summary -->
+                        <page string="هيكل التكاليف والمطابقة المالية" name="costs">
+                            <group>
+                                <group string="تفاصيل عناصر الكلفة التقديرية">
+                                    <field name="material_cost" widget="monetary"/>
+                                    <field name="shipping_cost" widget="monetary" invisible="is_local_supply"/>
+                                    <field name="customs_cost" widget="monetary" invisible="is_local_supply"/>
+                                    <field name="other_cost" widget="monetary"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline">
+                                        <label for="total_contract_cost"/>
+                                    </div>
+                                    <field name="total_contract_cost" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                </group>
+                                <group string="مركز الكلفة والمصروفات الفعلية">
+                                    <field name="analytic_account_id"/>
+                                    <field name="analytic_distribution" widget="analytic_distribution" invisible="1"/>
+                                    <field name="analytic_incurred_cost" widget="monetary"/>
+                                    <field name="total_actual_spent" widget="monetary"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline">
+                                        <label for="contract_tender_value"/>
+                                    </div>
+                                    <field name="contract_tender_value" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                    <field name="expected_profit_margin" widget="monetary" decoration-success="expected_profit_margin &gt;= 0" decoration-danger="expected_profit_margin &lt; 0"/>
+                                    <field name="profit_percentage"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 4: Delay Penalties -->
+                        <page string="الغرامات التأخيرية والمدد التعويضية" name="penalties">
+                            <group>
+                                <group string="شروط الغرامة والتمديدات المعتمدة">
+                                    <field name="apply_penalty"/>
+                                    <field name="penalty_rate_per_day" invisible="not apply_penalty"/>
+                                    <field name="time_extension_days"/>
+                                    <field name="delay_days"/>
+                                </group>
+                                <group string="مبالغ الاستقطاع وصافي المستحقات">
+                                    <field name="total_penalty_amount" widget="monetary" decoration-danger="total_penalty_amount &gt; 0"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline">
+                                        <label for="net_contract_payout"/>
+                                    </div>
+                                    <field name="net_contract_payout" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 5: Tax Retentions & Clearance -->
+                        <page string="الاستقطاعات الضريبية وبراءة الذمة" name="tax">
+                            <group>
+                                <group string="أمانات الهيئة العامة للضرائب">
+                                    <field name="tax_retention_rate"/>
+                                    <field name="tax_retention_amount" widget="monetary"/>
+                                </group>
+                                <group string="موقف براءة الذمة الرسمية">
+                                    <field name="tax_clearance_status" widget="badge"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 6: Payment Schedule -->
+                        <page string="جدول الدفعات وتنبيهات الاستحقاق" name="payments">
+                            <group>
+                                <group>
+                                    <field name="payment_type"/>
+                                    <field name="due_status" widget="badge" decoration-success="due_status == 'paid'" decoration-info="due_status == 'up_to_date'" decoration-warning="due_status == 'due_soon'" decoration-danger="due_status == 'overdue'"/>
+                                    <field name="next_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="total_paid_amount" widget="monetary"/>
+                                    <field name="remaining_payment_amount" widget="monetary"/>
+                                </group>
+                            </group>
+                            <field name="payment_schedule_ids">
+                                <list editable="bottom">
+                                    <field name="due_date"/>
+                                    <field name="name"/>
+                                    <field name="percentage"/>
+                                    <field name="amount" widget="monetary"/>
+                                    <field name="state" widget="badge" decoration-danger="state == 'overdue'" decoration-warning="state == 'due_soon'" decoration-success="state == 'paid'"/>
+                                    <field name="actual_payment_date"/>
+                                    <field name="payment_reference"/>
+                                    <field name="notes" optional="show"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <button name="action_mark_as_paid" string="تسديد" type="object" icon="fa-check" invisible="state == 'paid'" class="btn-success"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Tab 7: Handover & Warranty -->
+                        <page string="محاضر الاستلام وفترة الضمان والصيانة" name="handover">
+                            <group>
+                                <group string="الاستلام الأولي والصيانة">
+                                    <field name="provisional_handover_date"/>
+                                    <field name="warranty_period_months"/>
+                                </group>
+                                <group string="الاستلام النهائي وإطلاق الكفالات">
+                                    <field name="final_handover_date"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 8: Categorized Documents & Multi-attachment -->
+                        <page string="أرشيف ومستندات العقد والمناقصة" name="documents">
+                            <field name="document_ids">
+                                <list editable="bottom">
+                                    <field name="doc_date"/>
+                                    <field name="doc_number"/>
+                                    <field name="name"/>
+                                    <field name="doc_type"/>
+                                    <field name="attachment_ids" widget="many2many_binary" string="المرفقات"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Tab 9: Technical Details & Scope -->
+                        <page string="تفاصيل العقد ونطاق العمل" name="description">
+                            <field name="description" placeholder="إدخال الشروط الفنية، بنود الإحالة، المواصفات القياسية، التعبئة والتغليف، وشروط الضمان والصيانة..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Direct Supply Contract Search View -->
+    <record id="view_direct_supply_contract_search" model="ir.ui.view">
+        <field name="name">direct.supply.contract.search</field>
+        <field name="model">direct.supply.contract</field>
+        <field name="arch" type="xml">
+            <search string="بحث عقود التجهيز والمقاولات">
+                <field name="name"/>
+                <field name="contract_number"/>
+                <field name="contract_subject"/>
+                <field name="tender_id"/>
+                <field name="beneficiary_id"/>
+                <field name="vendor_id"/>
+                <field name="department_id"/>
+                <field name="responsible_user_id"/>
+                <separator/>
+                <filter string="المسودات" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="عقود قيد التنفيذ والتوريد" name="filter_in_progress" domain="[('state', 'in', ('signed', 'guarantee_deposited', 'sourcing', 'shipping', 'clearance', 'site_delivery'))]"/>
+                <filter string="الاستلام الأولي والصيانة" name="filter_warranty" domain="[('state', 'in', ('provisional_acceptance', 'final_acceptance'))]"/>
+                <filter string="عقود منجزة بالكامل" name="filter_completed" domain="[('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="عقود متأخرة عن التسليم" name="filter_delayed" domain="[('delay_days', '>', 0), ('state', '!=', 'completed')]"/>
+                <filter string="تجهيز داخلي (محلي)" name="filter_local" domain="[('is_local_supply', '=', True)]"/>
+                <filter string="تجهيز خارجي (استيراد)" name="filter_imported" domain="[('is_local_supply', '=', False)]"/>
+                <group>
+                    <filter string="المناقصة المرتبطة" name="group_by_tender" domain="[]" context="{'group_by': 'tender_id'}"/>
+                    <filter string="الجهة المستفيدة" name="group_by_beneficiary" domain="[]" context="{'group_by': 'beneficiary_id'}"/>
+                    <filter string="الجهة الموردة" name="group_by_vendor" domain="[]" context="{'group_by': 'vendor_id'}"/>
+                    <filter string="القسم المسؤول" name="group_by_department" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="مرحلة التنفيذ" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="تاريخ توقيع العقد" name="group_by_contract_date" domain="[]" context="{'group_by': 'contract_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Direct Supply Contract Pivot View -->
+    <record id="view_direct_supply_contract_pivot" model="ir.ui.view">
+        <field name="name">direct.supply.contract.pivot</field>
+        <field name="model">direct.supply.contract</field>
+        <field name="arch" type="xml">
+            <pivot string="تحليل عقود التجهيز والمقاولات" sample="1">
+                <field name="beneficiary_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="contract_tender_value" type="measure"/>
+                <field name="total_contract_cost" type="measure"/>
+                <field name="expected_profit_margin" type="measure"/>
+                <field name="total_penalty_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_direct_supply_contract_all" model="ir.actions.act_window">
+        <field name="name">عقود التجهيز المباشر والمقاولات</field>
+        <field name="res_model">direct.supply.contract</field>
+        <field name="view_mode">kanban,list,form,pivot</field>
+        <field name="search_view_id" ref="view_direct_supply_contract_search"/>
+    </record>
+
+    <record id="action_direct_supply_contract_delayed" model="ir.actions.act_window">
+        <field name="name">العقود المتأخرة والغرامات التأخيرية</field>
+        <field name="res_model">direct.supply.contract</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('delay_days', '>', 0), ('state', '!=', 'completed')]</field>
+        <field name="search_view_id" ref="view_direct_supply_contract_search"/>
+    </record>
+</odoo>

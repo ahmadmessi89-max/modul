@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tender Participation Kanban View -->
+    <record id="view_iraqi_tender_announcement_kanban" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.kanban</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" sample="1">
+                <field name="name"/>
+                <field name="tender_number"/>
+                <field name="tender_title"/>
+                <field name="beneficiary_id"/>
+                <field name="tender_type"/>
+                <field name="total_bid_amount"/>
+                <field name="expected_profit_amount"/>
+                <field name="currency_id"/>
+                <field name="submission_deadline"/>
+                <field name="bid_bond_status"/>
+                <field name="our_rank"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong class="text-primary font-weight-bold"><field name="name"/></strong>
+                            <span class="badge rounded-pill bg-dark text-white"><field name="tender_number"/></span>
+                        </div>
+                        <div class="mb-2">
+                            <h5 class="fw-bold mb-1 text-truncate"><field name="tender_title"/></h5>
+                            <div class="text-muted small"><field name="beneficiary_id"/></div>
+                            <div class="text-info small"><field name="tender_type"/></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center my-2 py-1 border-top border-bottom">
+                            <div>
+                                <span class="text-muted small">مبلغ العطاء المقدم:</span>
+                                <div class="fw-bold text-success"><field name="total_bid_amount" widget="monetary"/></div>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted small">الربح المتوقع:</span>
+                                <div class="fw-bold text-primary"><field name="expected_profit_amount" widget="monetary"/></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2 pt-1 border-top">
+                            <span class="badge bg-secondary">موعد التقديم: <field name="submission_deadline"/></span>
+                            <field name="responsible_user_id" widget="many2one_avatar_user"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Tender Participation List View -->
+    <record id="view_iraqi_tender_announcement_list" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.list</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="arch" type="xml">
+            <list string="المناقصات والعطاءات المشارك بها" decoration-info="state == 'submitted'" decoration-warning="state == 'opening'" decoration-success="state in ('awarded', 'contracted')" decoration-muted="state == 'lost'" decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="tender_number"/>
+                <field name="tender_title"/>
+                <field name="beneficiary_id"/>
+                <field name="tender_type"/>
+                <field name="purchase_date" optional="hide"/>
+                <field name="submission_deadline"/>
+                <field name="total_estimated_cost" widget="monetary" sum="إجمالي كلف التنفيذ التقديرية" optional="show"/>
+                <field name="total_bid_amount" widget="monetary" sum="إجمالي مبالغ العطاءات المقدمة"/>
+                <field name="expected_profit_amount" widget="monetary" sum="إجمالي الأرباح المتوقعة" optional="show"/>
+                <field name="expected_profit_margin" widget="percentage" optional="hide"/>
+                <field name="required_bid_bond" widget="monetary" optional="hide"/>
+                <field name="bid_bond_status" widget="badge" optional="show" decoration-success="bid_bond_status in ('active', 'released')" decoration-warning="bid_bond_status == 'extended'" decoration-danger="bid_bond_status == 'confiscated'"/>
+                <field name="our_rank" optional="show"/>
+                <field name="responsible_user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft', 'submitted')" decoration-warning="state == 'opening'" decoration-success="state in ('awarded', 'contracted')" decoration-muted="state == 'lost'" decoration-danger="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tender Participation Form View -->
+    <record id="view_iraqi_tender_announcement_form" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.form</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="arch" type="xml">
+            <form string="ملف المشاركة في المناقصة والعطاء">
+                <header>
+                    <button name="action_submit_bid" string="تأكيد تقديم العطاء والكفالة" type="object" invisible="state != 'draft'" class="btn-primary" icon="fa-paper-plane"/>
+                    <button name="action_open_envelopes" string="فتح المظاريف والتقييم" type="object" invisible="state != 'submitted'" class="btn-primary" icon="fa-folder-open"/>
+                    <button name="action_win_award" string="فوز بالعطاء والمصادقة على الإحالة" type="object" invisible="state not in ('submitted', 'opening')" class="btn-success" icon="fa-trophy"/>
+                    <button name="action_mark_lost" string="تسجيل عدم الفوز بالعطاء" type="object" invisible="state not in ('submitted', 'opening')" class="btn-warning" icon="fa-times-circle"/>
+                    <button name="action_release_bid_bond" string="استرداد وإلغاء الكفالة المصرفية" type="object" invisible="bid_bond_status != 'active'" class="btn-secondary" icon="fa-undo"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة والتسعير" type="object" invisible="state in ('draft', 'contracted')" class="btn-secondary"/>
+                    <button name="action_cancel" string="اعتذار / إلغاء المناقصة" type="object" invisible="state in ('contracted', 'cancelled')" class="btn-danger"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,opening,awarded,contracted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <div class="oe_title">
+                        <span class="o_form_label">رمز ملف المشاركة في المناقصة</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="بيانات المناقصة والجهة المستفيدة / المعلنة">
+                            <field name="tender_number" placeholder="مثال: م/2026/04"/>
+                            <field name="tender_title" placeholder="موضوع المناقصة أو التجهيز..."/>
+                            <field name="beneficiary_id" placeholder="الوزارة / المحافظة / العميل المعلن..."/>
+                            <field name="tender_type"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group string="المواعيد ورسوم الشراء والمسؤوليات">
+                            <field name="purchase_date"/>
+                            <field name="tender_doc_cost" widget="monetary"/>
+                            <field name="tender_doc_receipt" placeholder="رقم وصل الشراء"/>
+                            <field name="submission_deadline"/>
+                            <field name="envelope_opening_date"/>
+                            <field name="department_id"/>
+                            <field name="responsible_user_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+
+                    <!-- Financial Estimation Overview -->
+                    <div class="row mt-3 mb-3 p-3 bg-light rounded border">
+                        <div class="col-md-3 text-center border-end">
+                            <span class="text-muted d-block small">الكلفة التقديرية الداخلية (شراء/تنفيذ)</span>
+                            <span class="h4 fw-bold text-dark"><field name="total_estimated_cost" widget="monetary"/></span>
+                        </div>
+                        <div class="col-md-3 text-center border-end">
+                            <span class="text-muted d-block small">مبلغ العطاء المقدم (Offered Bid)</span>
+                            <span class="h4 fw-bold text-success"><field name="total_bid_amount" widget="monetary"/></span>
+                        </div>
+                        <div class="col-md-3 text-center border-end">
+                            <span class="text-muted d-block small">هامش الربح المتوقع</span>
+                            <span class="h4 fw-bold text-primary"><field name="expected_profit_amount" widget="monetary"/></span>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <span class="text-muted d-block small">نسبة الربح المتوقعة</span>
+                            <span class="h4 fw-bold text-info"><field name="expected_profit_margin"/>%</span>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <!-- Tab 1: BOQ Pricing & Margin Analysis -->
+                        <page string="جدول الكميات والتسعير والربحية (BOQ Pricing)" name="pricing">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="cost_price" widget="monetary"/>
+                                    <field name="total_cost" widget="monetary" sum="إجمالي الكلفة التقديرية"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary" sum="إجمالي سعر العطاء المقدم"/>
+                                    <field name="margin_amount" widget="monetary" sum="إجمالي الربح" optional="show"/>
+                                    <field name="margin_percentage" widget="percentage" optional="show"/>
+                                    <field name="notes" optional="hide"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Tab 2: Bid Bond Guarantee -->
+                        <page string="كفالة دخول المناقصة (Bid Bond 1%)" name="bid_bond">
+                            <group>
+                                <group string="بيانات خطاب الضمان المصرفي">
+                                    <field name="bid_bond_percentage"/>
+                                    <field name="required_bid_bond" widget="monetary"/>
+                                    <field name="bid_bond_number" placeholder="مثال: LG-2026-9988"/>
+                                    <field name="bid_bond_bank" placeholder="مثال: المصرف العراقي للتجارة TBI"/>
+                                </group>
+                                <group string="الصلاحية والموقف القانوني للكفالة">
+                                    <field name="bid_bond_issue_date"/>
+                                    <field name="bid_bond_expiry_date"/>
+                                    <field name="bid_bond_status" widget="badge"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 3: Required Documents Checklist -->
+                        <page string="قائمة المستمسكات والوثائق المطلوبة" name="checklist">
+                            <group string="التدقيق الإداري والفني والمالي لملف العطاء">
+                                <group>
+                                    <field name="doc_company_reg" widget="boolean_toggle"/>
+                                    <field name="doc_tax_clearance" widget="boolean_toggle"/>
+                                    <field name="doc_contractor_classification" widget="boolean_toggle"/>
+                                    <field name="doc_similar_works" widget="boolean_toggle"/>
+                                </group>
+                                <group>
+                                    <field name="doc_financial_statements" widget="boolean_toggle"/>
+                                    <field name="doc_bid_bond_ready" widget="boolean_toggle"/>
+                                    <field name="doc_technical_offer" widget="boolean_toggle"/>
+                                    <field name="doc_financial_offer" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 4: Competitor Analysis -->
+                        <page string="المنافسون وموقف فتح المظاريف" name="competitors">
+                            <group>
+                                <group>
+                                    <field name="our_rank"/>
+                                </group>
+                                <group>
+                                    <field name="competitor_count"/>
+                                </group>
+                            </group>
+                            <field name="competitor_ids">
+                                <list editable="bottom" decoration-success="is_awarded">
+                                    <field name="financial_rank"/>
+                                    <field name="partner_id"/>
+                                    <field name="bid_amount" widget="monetary"/>
+                                    <field name="has_bid_bond"/>
+                                    <field name="technical_compliance"/>
+                                    <field name="is_awarded"/>
+                                    <field name="notes"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Tab 5: Awarding / Loss Analysis -->
+                        <page string="موقف الإحالة والمصادقة" name="awarding">
+                            <group>
+                                <group string="بيانات الإحالة الرسمية (في حال الفوز)" invisible="not is_won and state != 'awarded'">
+                                    <field name="award_letter_number" placeholder="مثال: إحالة/2026/88"/>
+                                    <field name="award_letter_date"/>
+                                    <field name="awarded_amount" widget="monetary"/>
+                                </group>
+                                <group string="أسباب عدم الفوز والدروس المستفادة (في حال الخسارة)" invisible="state != 'lost'">
+                                    <field name="lost_reason"/>
+                                    <field name="lost_notes" placeholder="ملاحظات تحليل الخسارة لتفاديها مستقبلاً..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Tab 6: Special Notes -->
+                        <page string="الملاحظات والشروط الخاصة" name="notes">
+                            <field name="notes" placeholder="الشروط القانونية والمالية والفنية الواجب توفرها في ملف العطاء..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tender Participation Search View -->
+    <record id="view_iraqi_tender_announcement_search" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.search</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="arch" type="xml">
+            <search string="بحث المناقصات والعطاءات">
+                <field name="name"/>
+                <field name="tender_number"/>
+                <field name="tender_title"/>
+                <field name="beneficiary_id"/>
+                <field name="responsible_user_id"/>
+                <field name="bid_bond_number"/>
+                <separator/>
+                <filter string="قيد الدراسة والتسعير" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="تم تقديم العطاء" name="filter_submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="فتح المظاريف والتحليل" name="filter_opening" domain="[('state', '=', 'opening')]"/>
+                <filter string="عطاءات فائزة (تمت الإحالة)" name="filter_awarded" domain="[('state', '=', 'awarded')]"/>
+                <filter string="عطاءات مبرمة بعقود" name="filter_contracted" domain="[('state', '=', 'contracted')]"/>
+                <filter string="عطاءات خاسرة" name="filter_lost" domain="[('state', '=', 'lost')]"/>
+                <separator/>
+                <filter string="كفالات مصرفية سارية ومودعة" name="filter_active_bonds" domain="[('bid_bond_status', '=', 'active')]"/>
+                <group>
+                    <filter string="الجهة المستفيدة / المعلنة" name="group_by_beneficiary" domain="[]" context="{'group_by': 'beneficiary_id'}"/>
+                    <filter string="أسلوب التعاقد" name="group_by_type" domain="[]" context="{'group_by': 'tender_type'}"/>
+                    <filter string="مرحلة العطاء" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="مسؤول التسعير" name="group_by_user" domain="[]" context="{'group_by': 'responsible_user_id'}"/>
+                    <filter string="موقف كفالة الدخول" name="group_by_bond" domain="[]" context="{'group_by': 'bid_bond_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tender Participation Pivot View -->
+    <record id="view_iraqi_tender_announcement_pivot" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.pivot</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="arch" type="xml">
+            <pivot string="تحليل المناقصات والعطاءات" sample="1">
+                <field name="beneficiary_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="total_bid_amount" type="measure"/>
+                <field name="expected_profit_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_iraqi_tender_announcement_all" model="ir.actions.act_window">
+        <field name="name">كافة المناقصات والعطاءات المشارك بها</field>
+        <field name="res_model">iraqi.tender.announcement</field>
+        <field name="view_mode">kanban,list,form,pivot</field>
+        <field name="search_view_id" ref="view_iraqi_tender_announcement_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                قم بتسجيل أول مناقصة / دعوة مباشرة للدخول فيها وتسعير العطاء
+            </p>
+        </field>
+    </record>
+
+    <record id="action_iraqi_tender_pricing" model="ir.actions.act_window">
+        <field name="name">دراسة وتسعير العطاءات (قيد الإعداد)</field>
+        <field name="res_model">iraqi.tender.announcement</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('state', '=', 'draft')]</field>
+        <field name="context">{'default_state': 'draft'}</field>
+    </record>
+
+    <record id="action_iraqi_tender_submitted" model="ir.actions.act_window">
+        <field name="name">العطاءات المقدمة والمفتوحة</field>
+        <field name="res_model">iraqi.tender.announcement</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('state', 'in', ('submitted', 'opening'))]</field>
+    </record>
+
+    <record id="action_iraqi_tender_won" model="ir.actions.act_window">
+        <field name="name">العطاءات الفائزة والمصادق عليها</field>
+        <field name="res_model">iraqi.tender.announcement</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('state', 'in', ('awarded', 'contracted'))]</field>
+    </record>
+</odoo>

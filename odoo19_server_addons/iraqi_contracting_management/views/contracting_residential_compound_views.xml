@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Residential Unit List View -->
+    <record id="view_contracting_residential_unit_list" model="ir.ui.view">
+        <field name="name">contracting.residential.unit.list</field>
+        <field name="model">contracting.residential.unit</field>
+        <field name="arch" type="xml">
+            <list string="الوحدات والفلل السكنية بالمجمعات">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="block"/>
+                <field name="unit_type"/>
+                <field name="built_area_sqm"/>
+                <field name="status" widget="badge" decoration-info="status in ['structure', 'finishing']" decoration-success="status in ['ready', 'handed_over']" decoration-warning="status in ['reserved', 'sold']"/>
+                <field name="partner_id"/>
+                <field name="accumulated_cost" widget="monetary" sum="إجمالي التكلفة"/>
+                <field name="target_selling_price" widget="monetary" sum="إجمالي المبيعات"/>
+                <field name="profit_margin" widget="monetary" sum="إجمالي الأرباح"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Residential Unit Kanban View -->
+    <record id="view_contracting_residential_unit_kanban" model="ir.ui.view">
+        <field name="name">contracting.residential.unit.kanban</field>
+        <field name="model">contracting.residential.unit</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="block"/>
+                <field name="unit_type"/>
+                <field name="status"/>
+                <field name="target_selling_price"/>
+                <field name="accumulated_cost"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                    <div class="text-muted"><field name="block"/> | <field name="unit_type"/></div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom mt-2">
+                                <div class="oe_kanban_bottom_left">
+                                    <span>الكلفة: <field name="accumulated_cost" widget="monetary"/></span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <span>البيع: <field name="target_selling_price" widget="monetary"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Residential Unit Form View -->
+    <record id="view_contracting_residential_unit_form" model="ir.ui.view">
+        <field name="name">contracting.residential.unit.form</field>
+        <field name="model">contracting.residential.unit</field>
+        <field name="arch" type="xml">
+            <form string="وحدة سكنية / فيلا">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="structure,finishing,ready,reserved,sold,handed_over"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="رقم أو رمز الوحدة"/>
+                        <h1><field name="name" placeholder="مثال: V-102 أو شقة 304"/></h1>
+                    </div>
+                    <group>
+                        <group string="بيانات المجمع والتصنيف">
+                            <field name="project_id"/>
+                            <field name="block"/>
+                            <field name="unit_type"/>
+                            <field name="partner_id" placeholder="اسم المشتري أو الحاجز"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="المساحات والأسعار">
+                            <field name="land_area_sqm"/>
+                            <field name="built_area_sqm"/>
+                            <field name="target_selling_price" widget="monetary"/>
+                            <field name="accumulated_cost" widget="monetary" readonly="1"/>
+                            <field name="profit_margin" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="أذونات صرف المواد المخصصة للوحدة" name="requisitions">
+                            <field name="requisition_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="total_cost" widget="monetary" sum="الإجمالي"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="ملاحظات وتفاصيل التشطيب" name="notes">
+                            <field name="notes" placeholder="مواصفات السيراميك، الأطقم، التعديلات المطلوبة من المشتري..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Residential Unit Action -->
+    <record id="action_contracting_residential_unit" model="ir.actions.act_window">
+        <field name="name">الوحدات والفلل السكنية بالمجمعات</field>
+        <field name="res_model">contracting.residential.unit</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                قم بتسجيل الفلل والوحدات السكنية لمتابعة كلف الإنهاءات ومبيعات المجمع!
+            </p>
+        </field>
+    </record>
+</odoo>

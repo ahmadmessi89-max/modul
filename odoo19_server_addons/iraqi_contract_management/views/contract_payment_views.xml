@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Schedule List View -->
+    <record id="view_direct_supply_payment_list" model="ir.ui.view">
+        <field name="name">direct.supply.payment.schedule.list</field>
+        <field name="model">direct.supply.payment.schedule</field>
+        <field name="arch" type="xml">
+            <list string="جدول الدفعات ومواعيد الاستحقاق" decoration-danger="state == 'overdue'" decoration-warning="state == 'due_soon'" decoration-success="state == 'paid'">
+                <field name="due_date"/>
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="percentage"/>
+                <field name="amount" widget="monetary"/>
+                <field name="state" widget="badge" decoration-danger="state == 'overdue'" decoration-warning="state == 'due_soon'" decoration-success="state == 'paid'"/>
+                <field name="actual_payment_date"/>
+                <field name="payment_reference"/>
+                <field name="currency_id" column_invisible="True"/>
+                <button name="action_mark_as_paid" string="تسديد الدفعة" type="object" icon="fa-check" invisible="state == 'paid'" class="btn-success"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Payment Schedule Form View -->
+    <record id="view_direct_supply_payment_form" model="ir.ui.view">
+        <field name="name">direct.supply.payment.schedule.form</field>
+        <field name="model">direct.supply.payment.schedule</field>
+        <field name="arch" type="xml">
+            <form string="دفعة عقد التجهيز">
+                <header>
+                    <button name="action_mark_as_paid" string="تأكيد تسديد الدفعة" type="object" invisible="state == 'paid'" class="btn-primary"/>
+                    <button name="action_reset_pending" string="إعادة للانتظار" type="object" invisible="state == 'pending'" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,due_soon,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="بيان / اسم الدفعة"/>
+                        <h1>
+                            <field name="name" placeholder="مثال: الدفعة الأولى - السلفة التشغيلية (10%)"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="بيانات العقد والمبلغ">
+                            <field name="contract_id"/>
+                            <field name="percentage"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="تواريخ الاستحقاق والتسديد">
+                            <field name="due_date"/>
+                            <field name="actual_payment_date"/>
+                            <field name="payment_reference" placeholder="رقم الصك أو إشعار البنك..."/>
+                        </group>
+                    </group>
+                    <group string="شروط وملاحظات الدفعة">
+                        <field name="notes" placeholder="الشروط التعاقدية المرتبطة بهذه الدفعة..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Payment Schedule Search View -->
+    <record id="view_direct_supply_payment_search" model="ir.ui.view">
+        <field name="name">direct.supply.payment.schedule.search</field>
+        <field name="model">direct.supply.payment.schedule</field>
+        <field name="arch" type="xml">
+            <search string="بحث الدفعات">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="payment_reference"/>
+                <separator/>
+                <filter string="الدفعات المستحقة قريباً" name="filter_due_soon" domain="[('state', '=', 'due_soon')]"/>
+                <filter string="الدفعات المتأخرة (Overdue)" name="filter_overdue" domain="[('state', '=', 'overdue')]"/>
+                <filter string="الدفعات المسددة" name="filter_paid" domain="[('state', '=', 'paid')]"/>
+                <group>
+                    <filter string="العقد المرتبط" name="group_by_contract" domain="[]" context="{'group_by': 'contract_id'}"/>
+                    <filter string="حالة الدفعة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="تاريخ الاستحقاق" name="group_by_due_date" domain="[]" context="{'group_by': 'due_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Payment Schedule Action -->
+    <record id="action_direct_supply_payment" model="ir.actions.act_window">
+        <field name="name">جدول الدفعات وتنبيهات الاستحقاق</field>
+        <field name="res_model">direct.supply.payment.schedule</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_direct_supply_payment_search"/>
+    </record>
+</odoo>

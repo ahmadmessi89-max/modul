@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Variation Orders (أوامر الغيار) -->
+        <record id="seq_contracting_variation_order" model="ir.sequence">
+            <field name="name">Iraqi Contracting Variation Order Sequence</field>
+            <field name="code">contracting.variation.order</field>
+            <field name="prefix">VO/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Client Interim Payment Certificate (الذرعات والسلف المنجزة لرب العمل) -->
+        <record id="seq_contracting_client_ipc" model="ir.sequence">
+            <field name="name">Iraqi Contracting Client Progress Certificate Sequence</field>
+            <field name="code">contracting.interim.payment.client</field>
+            <field name="prefix">IPC-CL/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Subcontractor IPC (ذرعات وسلف المقاولين الثانويين) -->
+        <record id="seq_contracting_subcontractor_ipc" model="ir.sequence">
+            <field name="name">Iraqi Contracting Subcontractor Progress Certificate Sequence</field>
+            <field name="code">contracting.interim.payment.subcontractor</field>
+            <field name="prefix">IPC-SUB/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Site Material Delivery (إدخال مخزني موقعي) -->
+        <record id="seq_contracting_site_delivery" model="ir.sequence">
+            <field name="name">Iraqi Contracting Site Material Delivery Sequence</field>
+            <field name="code">contracting.site.delivery</field>
+            <field name="prefix">DEL/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Site Petty Cash (سلفة نقدية موقعية / ذمة المهندس) -->
+        <record id="seq_contracting_petty_cash" model="ir.sequence">
+            <field name="name">Iraqi Contracting Site Petty Cash Sequence</field>
+            <field name="code">contracting.petty.cash</field>
+            <field name="prefix">PC/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for BOQ Item Code generator if left blank -->
+        <record id="seq_contracting_boq_item" model="ir.sequence">
+            <field name="name">Iraqi Contracting BOQ Item Sequence</field>
+            <field name="code">contracting.project.boq</field>
+            <field name="prefix">BOQ-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Subcontract Agreement (عقود مقاولي الباطن) -->
+        <record id="seq_contracting_subcontract_agreement" model="ir.sequence">
+            <field name="name">Iraqi Subcontract Agreement Sequence</field>
+            <field name="code">contracting.subcontract.agreement</field>
+            <field name="prefix">SUB-CTR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Material Requisition (أذونات صرف المواد) -->
+        <record id="seq_contracting_material_requisition" model="ir.sequence">
+            <field name="name">Iraqi Contracting Material Requisition Sequence</field>
+            <field name="code">contracting.material.requisition</field>
+            <field name="prefix">REQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Hotel Daily Revenue (كشف إيرادات الفنادق اليومي) -->
+        <record id="seq_hotel_daily_revenue" model="ir.sequence">
+            <field name="name">Hotel Daily Revenue Sequence</field>
+            <field name="code">hotel.daily.revenue</field>
+            <field name="prefix">HDR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

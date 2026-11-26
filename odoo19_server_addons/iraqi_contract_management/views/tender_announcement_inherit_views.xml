@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_iraqi_tender_announcement_form_inherit_contract" model="ir.ui.view">
+        <field name="name">iraqi.tender.announcement.form.inherit.contract</field>
+        <field name="model">iraqi.tender.announcement</field>
+        <field name="inherit_id" ref="iraqi_tender_management.view_iraqi_tender_announcement_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_generate_contract"
+                        string="إبرام وإنشاء عقد التجهيز"
+                        type="object"
+                        invisible="state != 'awarded' or contract_count &gt; 0"
+                        class="btn-success font-weight-bold"
+                        icon="fa-file-text-o"/>
+            </header>
+
+            <div name="button_box" position="inside">
+                <button name="action_view_contracts"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-contract"
+                        invisible="contract_count == 0">
+                    <field name="contract_count" widget="statinfo" string="عقود التجهيز المبرمة"/>
+                </button>
+            </div>
+
+            <notebook position="inside">
+                <page string="عقود التجهيز المبرمة" name="contracts" invisible="contract_count == 0">
+                    <field name="contract_ids" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="contract_number"/>
+                            <field name="contract_subject"/>
+                            <field name="vendor_id"/>
+                            <field name="contract_date"/>
+                            <field name="expected_delivery_date"/>
+                            <field name="total_contract_cost" widget="monetary"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

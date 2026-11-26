@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format: Iraqi Legal/A4 Landscape for IPC Detailed Measurement Sheet -->
+    <record id="paperformat_contracting_landscape" model="report.paperformat">
+        <field name="name">Iraqi Contracting Landscape A4</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Report Action 1: Interim Payment Certificate (كشف الذرعة المنجزة) -->
+    <record id="action_report_contracting_ipc" model="ir.actions.report">
+        <field name="name">كشف ذرعة منجزة دورية (Monthly Progress Certificate - IPC)</field>
+        <field name="model">contracting.interim.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_contracting_management.report_ipc_document</field>
+        <field name="report_file">iraqi_contracting_management.report_ipc_document</field>
+        <field name="print_report_name">'كشف_ذرعة_' + (object.name or '').replace('/', '_')</field>
+        <field name="binding_model_id" ref="model_contracting_interim_payment"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_contracting_landscape"/>
+    </record>
+
+    <!-- Report Action 2: Project BOQ (جدول الكميات والتسعير المعتمد) -->
+    <record id="action_report_contracting_boq" model="ir.actions.report">
+        <field name="name">جدول الكميات والتسعير المعتمد (Approved BOQ)</field>
+        <field name="model">project.project</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_contracting_management.report_boq_document</field>
+        <field name="report_file">iraqi_contracting_management.report_boq_document</field>
+        <field name="print_report_name">'جدول_كميات_' + (object.name or '').replace('/', '_')</field>
+        <field name="binding_model_id" ref="project.model_project_project"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_contracting_landscape"/>
+    </record>
+
+    <!-- Report Action 3: BOQ Variance & Budget Control Report (تقرير انحراف تكاليف جدول الكميات) -->
+    <record id="action_report_contracting_boq_variance" model="ir.actions.report">
+        <field name="name">تقرير انحراف تكاليف وموازنة جدول الكميات (BOQ Cost Variance)</field>
+        <field name="model">project.project</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_contracting_management.report_boq_variance_document</field>
+        <field name="report_file">iraqi_contracting_management.report_boq_variance_document</field>
+        <field name="print_report_name">'تقرير_انحراف_موازنة_' + (object.name or '').replace('/', '_')</field>
+        <field name="binding_model_id" ref="project.model_project_project"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_contracting_landscape"/>
+    </record>
+
+    <!-- Report Action 4: Variation Orders Status Report (كشف موقف أوامر الغيار والمطابقة التعاقدية) -->
+    <record id="action_report_contracting_vo_summary" model="ir.actions.report">
+        <field name="name">كشف موقف أوامر الغيار والمطابقة التعاقدية (VO Status Report)</field>
+        <field name="model">project.project</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">iraqi_contracting_management.report_vo_summary_document</field>
+        <field name="report_file">iraqi_contracting_management.report_vo_summary_document</field>
+        <field name="print_report_name">'موقف_أوامر_الغيار_' + (object.name or '').replace('/', '_')</field>
+        <field name="binding_model_id" ref="project.model_project_project"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_contracting_landscape"/>
+    </record>
+</odoo>

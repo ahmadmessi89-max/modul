@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Security Category -->
+        <record id="module_category_contracting" model="ir.module.category">
+            <field name="name">إدارة المقاولات والمشاريع الإنشائية</field>
+            <field name="description">صلاحيات إدارة المقاولات والذرعات الهندسية والموازنات التحليلية</field>
+            <field name="sequence">35</field>
+        </record>
+
+        <!-- Privilege for Odoo 19 Groups -->
+        <record id="res_groups_privilege_contracting" model="res.groups.privilege">
+            <field name="name">إدارة المقاولات</field>
+            <field name="sequence">10</field>
+            <field name="category_id" ref="module_category_contracting"/>
+        </record>
+
+        <!-- User Groups -->
+        <!-- 1. Site Engineer -->
+        <record id="group_contracting_site_engineer" model="res.groups">
+            <field name="name">مهندس الموقع (Site Engineer)</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_contracting"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('project.group_project_user'))]"/>
+            <field name="comment">يستطيع تسجيل وتحديث الذرعات الموقعية، ومتابعة بنود جدول الكميات للمشاريع المكلف بها.</field>
+        </record>
+
+        <!-- 2. Project Manager -->
+        <record id="group_contracting_project_manager" model="res.groups">
+            <field name="name">مدير المشروع (Project Manager)</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_contracting"/>
+            <field name="implied_ids" eval="[(4, ref('group_contracting_site_engineer')), (4, ref('project.group_project_manager')), (4, ref('purchase.group_purchase_user'))]"/>
+            <field name="comment">يستطيع اعتماد جداول الكميات، تقديم وتصديق أوامر الغيار، والمصادقة الفنية على الذرعات والسلف المنجزة.</field>
+        </record>
+
+        <!-- 3. Financial Auditor -->
+        <record id="group_contracting_financial_auditor" model="res.groups">
+            <field name="name">المدقق المالي للمشاريع (Contracting Financial Auditor)</field>
+            <field name="sequence">30</field>
+            <field name="privilege_id" ref="res_groups_privilege_contracting"/>
+            <field name="implied_ids" eval="[(4, ref('group_contracting_project_manager')), (4, ref('account.group_account_invoice'))]"/>
+            <field name="comment">يستطيع تدقيق القيود المالية للذرعات، ومراقبة استقطاعات الصيانة واسترداد السلفة التشغيلية، ومطابقة الموازنات التحليلية.</field>
+        </record>
+
+        <!-- Automatically grant full contracting permissions to Administrators -->
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_contracting_financial_auditor'))]"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- Multi-Company Rules -->
+        <record id="contracting_boq_multi_company_rule" model="ir.rule">
+            <field name="name">Contracting BOQ Multi-Company</field>
+            <field name="model_id" ref="model_contracting_project_boq"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="contracting_vo_multi_company_rule" model="ir.rule">
+            <field name="name">Contracting Variation Order Multi-Company</field>
+            <field name="model_id" ref="model_contracting_variation_order"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="contracting_ipc_multi_company_rule" model="ir.rule">
+            <field name="name">Contracting IPC Multi-Company</field>
+            <field name="model_id" ref="model_contracting_interim_payment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Record Rule: Site Engineer Project Visibility -->
+        <record id="contracting_boq_site_engineer_rule" model="ir.rule">
+            <field name="name">Site Engineer: Assigned Projects BOQ</field>
+            <field name="model_id" ref="model_contracting_project_boq"/>
+            <field name="groups" eval="[(4, ref('group_contracting_site_engineer'))]"/>
+            <field name="domain_force">[
+                '|',
+                ('project_id.user_id', '=', user.id),
+                '|',
+                ('project_id.site_engineer_ids', 'in', user.id),
+                ('project_id.privacy_visibility', '!=', 'followers')
+            ]</field>
+        </record>
+
+        <record id="contracting_ipc_site_engineer_rule" model="ir.rule">
+            <field name="name">Site Engineer: Assigned Projects IPCs</field>
+            <field name="model_id" ref="model_contracting_interim_payment"/>
+            <field name="groups" eval="[(4, ref('group_contracting_site_engineer'))]"/>
+            <field name="domain_force">[
+                '|',
+                ('project_id.user_id', '=', user.id),
+                '|',
+                ('project_id.site_engineer_ids', 'in', user.id),
+                ('create_uid', '=', user.id)
+            ]</field>
+        </record>
+
+        <!-- Record Rule: Project Manager and Financial Auditor (Full Access across company) -->
+        <record id="contracting_boq_manager_auditor_rule" model="ir.rule">
+            <field name="name">Project Manager &amp; Auditor: All Company BOQs</field>
+            <field name="model_id" ref="model_contracting_project_boq"/>
+            <field name="groups" eval="[(4, ref('group_contracting_project_manager')), (4, ref('group_contracting_financial_auditor'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="contracting_ipc_manager_auditor_rule" model="ir.rule">
+            <field name="name">Project Manager &amp; Auditor: All Company IPCs</field>
+            <field name="model_id" ref="model_contracting_interim_payment"/>
+            <field name="groups" eval="[(4, ref('group_contracting_project_manager')), (4, ref('group_contracting_financial_auditor'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+    </data>
+</odoo>

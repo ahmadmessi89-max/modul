@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_iraqi_tender_announcement_user,iraqi.tender.announcement.user,model_iraqi_tender_announcement,group_iraqi_tender_user,1,1,1,0
+access_iraqi_tender_announcement_manager,iraqi.tender.announcement.manager,model_iraqi_tender_announcement,group_iraqi_tender_manager,1,1,1,1
+access_iraqi_tender_line_user,iraqi.tender.line.user,model_iraqi_tender_line,group_iraqi_tender_user,1,1,1,1
+access_iraqi_tender_line_manager,iraqi.tender.line.manager,model_iraqi_tender_line,group_iraqi_tender_manager,1,1,1,1
+access_iraqi_tender_competitor_user,iraqi.tender.competitor.user,model_iraqi_tender_competitor,group_iraqi_tender_user,1,1,1,1
+access_iraqi_tender_competitor_manager,iraqi.tender.competitor.manager,model_iraqi_tender_competitor,group_iraqi_tender_manager,1,1,1,1

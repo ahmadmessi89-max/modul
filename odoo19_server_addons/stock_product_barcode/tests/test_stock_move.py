@@ -1,0 +1,49 @@
+from odoo.tests import common, tagged
+
+
+@tagged('post_install', '-at_install')
+class TestStockMove(common.TransactionCase):
+    def setUp(self):
+        super().setUp()
+        self.StockMove = self.env['stock.move']
+        self.product = self.env['product.product'].create({
+            'name': 'Barcode Test Product',
+            'barcode': '123456789',
+        })
+        self.stock_picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_in').id,
+            'location_id': self.env.ref('stock.stock_location_suppliers').id,
+            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+        })
+
+    def test_onchange_product_barcode(self):
+        stock_move = self.StockMove.new({'product_barcode': '123456789'})
+        stock_move._onchange_product_barcode()
+        self.assertEqual(stock_move.product_id, self.product)
+
+    def test_onchange_product_id(self):
+        stock_move = self.StockMove.new({'product_id': self.product.id})
+        stock_move._onchange_product_id()
+        self.assertEqual(stock_move.product_barcode, self.product.barcode)
+
+    def test_create_product_barcode(self):
+        stock_move = self.StockMove.create({
+            'product_barcode': '123456789',
+            'picking_id': self.stock_picking.id,
+            'product_uom_qty': 1.0,
+            'product_uom': self.product.uom_id.id,
+            'location_id': self.stock_picking.location_id.id,
+            'location_dest_id': self.stock_picking.location_dest_id.id,
+        })
+        self.assertEqual(stock_move.product_id, self.product)
+
+    def test_create_product_id(self):
+        stock_move = self.StockMove.create({
+            'product_id': self.product.id,
+            'picking_id': self.stock_picking.id,
+            'product_uom_qty': 1.0,
+            'product_uom': self.product.uom_id.id,
+            'location_id': self.stock_picking.location_id.id,
+            'location_dest_id': self.stock_picking.location_dest_id.id,
+        })
+        self.assertEqual(stock_move.product_barcode, self.product.barcode)

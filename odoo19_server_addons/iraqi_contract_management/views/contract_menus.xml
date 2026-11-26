@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top Level Menu: Contract & Supply Management -->
+    <menuitem id="menu_iraqi_contract_root"
+              name="إدارة العقود والتجهيز"
+              web_icon="iraqi_contract_management,static/description/icon.png"
+              groups="iraqi_contract_management.group_iraqi_contract_user"
+              sequence="28"/>
+
+    <!-- Categories -->
+    <menuitem id="menu_iraqi_contract_category"
+              name="عقود التجهيز المباشر"
+              parent="menu_iraqi_contract_root"
+              sequence="10"/>
+
+    <menuitem id="menu_iraqi_contract_all"
+              name="كافة عقود التجهيز والمقاولات"
+              parent="menu_iraqi_contract_category"
+              action="action_direct_supply_contract_all"
+              sequence="10"/>
+
+    <menuitem id="menu_iraqi_contract_delayed"
+              name="العقود المتأخرة والغرامات"
+              parent="menu_iraqi_contract_category"
+              action="action_direct_supply_contract_delayed"
+              sequence="20"/>
+
+    <!-- Payments Category -->
+    <menuitem id="menu_iraqi_contract_payments_category"
+              name="الدفعات والتحصيل المالي"
+              parent="menu_iraqi_contract_root"
+              sequence="20"/>
+
+    <menuitem id="menu_iraqi_contract_payments"
+              name="جدول الدفعات وتنبيهات الاستحقاق"
+              parent="menu_iraqi_contract_payments_category"
+              action="action_direct_supply_payment"
+              sequence="10"/>
+
+    <!-- Documents Archive Category -->
+    <menuitem id="menu_iraqi_contract_documents_category"
+              name="الأرشيف والمستندات الرسمية"
+              parent="menu_iraqi_contract_root"
+              sequence="30"/>
+
+    <menuitem id="menu_iraqi_contract_documents"
+              name="أرشيف ومرفقات العقود"
+              parent="menu_iraqi_contract_documents_category"
+              action="action_direct_supply_document"
+              sequence="10"/>
+</odoo>

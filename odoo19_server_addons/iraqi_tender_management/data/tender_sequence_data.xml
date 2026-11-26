@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tender Announcement Sequence -->
+        <record id="seq_iraqi_tender_announcement" model="ir.sequence">
+            <field name="name">Tender Announcement Sequence</field>
+            <field name="code">iraqi.tender.announcement</field>
+            <field name="prefix">TND-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Tender Bid Sequence -->
+        <record id="seq_iraqi_tender_bid" model="ir.sequence">
+            <field name="name">Tender Bid Sequence</field>
+            <field name="code">iraqi.tender.bid</field>
+            <field name="prefix">BID-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

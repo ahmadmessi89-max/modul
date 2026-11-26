@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Interim Payment Certificate List View -->
+    <record id="view_contracting_interim_payment_tree" model="ir.ui.view">
+        <field name="name">contracting.interim.payment.list</field>
+        <field name="model">contracting.interim.payment</field>
+        <field name="arch" type="xml">
+            <list string="السلف المنجزة والذرعات الشهرية (IPCs)" decoration-info="state == 'draft'" decoration-warning="state in ('site_audited', 'approved')" decoration-success="state == 'invoiced'" decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="ipc_type"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="sequence_in_project" string="رقم السلفة"/>
+                <field name="date"/>
+                <field name="current_gross_amount" widget="monetary" sum="إجمالي إنجاز الفترة"/>
+                <field name="advance_deduction_amount" widget="monetary" sum="إجمالي استرداد السلفة التشغيلية" optional="show"/>
+                <field name="retention_amount" widget="monetary" sum="إجمالي أمانات الصيانة" optional="show"/>
+                <field name="net_payable_amount" widget="monetary" sum="صافي المستحق للصرف"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-primary="state == 'site_audited'" decoration-warning="state == 'approved'" decoration-success="state == 'invoiced'" decoration-danger="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Interim Payment Certificate Form View -->
+    <record id="view_contracting_interim_payment_form" model="ir.ui.view">
+        <field name="name">contracting.interim.payment.form</field>
+        <field name="model">contracting.interim.payment</field>
+        <field name="arch" type="xml">
+            <form string="السلفة المنجزة / الذرعة الشهرية">
+                <header>
+                    <button name="action_load_boq_lines" string="جلب بنود جدول الكميات والتراكمي السابق" type="object" invisible="state != 'draft'" class="btn-secondary" icon="fa-refresh"/>
+                    <button name="action_site_audit" string="تدقيق موقعي من المهندس" type="object" invisible="state != 'draft'" class="btn-primary" groups="iraqi_contracting_management.group_contracting_site_engineer,iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_approve" string="مصادقة واعتماد الذرعة" type="object" invisible="state != 'site_audited'" class="btn-primary" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_generate_invoice" string="توليد الفاتورة / القيد المحاسبي" type="object" invisible="state != 'approved'" class="btn-success" groups="iraqi_contracting_management.group_contracting_financial_auditor,account.group_account_invoice"/>
+                    <button name="action_cancel" string="إلغاء الذرعة" type="object" invisible="state in ('invoiced', 'cancelled')" class="btn-danger" groups="iraqi_contracting_management.group_contracting_project_manager"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state not in ('cancelled', 'site_audited')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,site_audited,approved,invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not invoice_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">الفاتورة / القيد</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="رقم السلفة المنجزة / الذرعة"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="بيانات العقد والمشروع">
+                            <field name="ipc_type" widget="radio" readonly="state != 'draft'"/>
+                            <field name="project_id" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="subcontract_id" invisible="ipc_type != 'subcontractor'" readonly="state != 'draft'"/>
+                            <field name="sequence_in_project" readonly="state in ('approved', 'invoiced')"/>
+                        </group>
+                        <group string="الفترة الزمنية والإشراف الهيكلي">
+                            <field name="date" readonly="state in ('approved', 'invoiced')"/>
+                            <field name="period_start" readonly="state in ('approved', 'invoiced')"/>
+                            <field name="period_end" readonly="state in ('approved', 'invoiced')"/>
+                            <field name="resident_engineer_id" readonly="state in ('approved', 'invoiced')"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="جدول الأعمال والذرعات المنفذة" name="lines">
+                            <field name="line_ids" readonly="state in ('approved', 'invoiced')">
+                                <list editable="bottom">
+                                    <field name="boq_id" domain="[('project_id', '=', parent.project_id)]" optional="show"/>
+                                    <field name="item_no"/>
+                                    <field name="name"/>
+                                    <field name="package_id" optional="hide"/>
+                                    <field name="uom_id"/>
+                                    <field name="contract_qty" readonly="1" force_save="1"/>
+                                    <field name="previous_qty" readonly="1" force_save="1" string="التراكمي السابق"/>
+                                    <field name="current_qty" string="ذرعة الفترة الحالية"/>
+                                    <field name="cumulative_qty" readonly="1" force_save="1" string="التراكمي الإجمالي"/>
+                                    <field name="completion_rate" widget="progressbar" string="الإنجاز %" optional="show"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="previous_amount" widget="monetary" sum="إجمالي السابق" optional="hide"/>
+                                    <field name="current_amount" widget="monetary" sum="إجمالي إنجاز الفترة"/>
+                                    <field name="cumulative_amount" widget="monetary" sum="إجمالي التراكمي"/>
+                                    <field name="notes" optional="hide"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="المعالجة المحاسبية والاستقطاعات والأمانات" name="accounting_deductions">
+                            <group>
+                                <group string="ملخص إنجاز الأعمال">
+                                    <field name="gross_cumulative_amount" widget="monetary"/>
+                                    <field name="previous_gross_amount" widget="monetary"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="current_gross_amount"/>
+                                    </div>
+                                    <field name="current_gross_amount" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                </group>
+
+                                <group string="استقطاعات وأمانات العقد المعتمدة">
+                                    <label for="advance_deduction_percent" string="استرداد السلفة التشغيلية"/>
+                                    <div class="o_row">
+                                        <field name="advance_deduction_percent" class="oe_inline" readonly="state in ('approved', 'invoiced')"/> %
+                                        <span class="oe_grey">المبلغ: </span>
+                                        <field name="advance_deduction_amount" class="oe_inline" widget="monetary"/>
+                                    </div>
+
+                                    <label for="retention_percent" string="أمانات صيانة واستقطاعات نظامية"/>
+                                    <div class="o_row">
+                                        <field name="retention_percent" class="oe_inline" readonly="state in ('approved', 'invoiced')"/> %
+                                        <span class="oe_grey">المبلغ: </span>
+                                        <field name="retention_amount" class="oe_inline" widget="monetary"/>
+                                    </div>
+
+                                    <label for="tax_deduction_percent" string="الاستقطاع الضريبي المباشر (العراق)" invisible="ipc_type != 'subcontractor'"/>
+                                    <div class="o_row" invisible="ipc_type != 'subcontractor'">
+                                        <field name="tax_deduction_percent" class="oe_inline" readonly="state in ('approved', 'invoiced')"/> %
+                                        <span class="oe_grey">المبلغ: </span>
+                                        <field name="tax_deduction_amount" class="oe_inline" widget="monetary"/>
+                                    </div>
+
+                                    <field name="other_deductions_amount" widget="monetary" readonly="state in ('approved', 'invoiced')"/>
+                                    <field name="other_deductions_note" invisible="other_deductions_amount == 0" readonly="state in ('approved', 'invoiced')"/>
+
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="net_payable_amount"/>
+                                    </div>
+                                    <field name="net_payable_amount" nolabel="1" class="oe_subtotal_footer_separator text-success font-weight-bold" widget="monetary"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="ملاحظات وتوصيات المهندس المقيم" name="notes">
+                            <field name="notes" placeholder="ملاحظات المهندس المقيم حول الجودة وفحوصات السيطرة النوعية والمطابقة الفنية..." readonly="state in ('approved', 'invoiced')"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Interim Payment Search View -->
+    <record id="view_contracting_interim_payment_search" model="ir.ui.view">
+        <field name="name">contracting.interim.payment.search</field>
+        <field name="model">contracting.interim.payment</field>
+        <field name="arch" type="xml">
+            <search string="بحث الذرعات والسلف المنجزة">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="partner_id"/>
+                <field name="resident_engineer_id"/>
+                <separator/>
+                <filter string="سلف رب العمل (Client IPC)" name="client_ipcs" domain="[('ipc_type', '=', 'client')]"/>
+                <filter string="ذرعات المقاولين الثانويين (Subcontractor IPC)" name="sub_ipcs" domain="[('ipc_type', '=', 'subcontractor')]"/>
+                <separator/>
+                <filter string="المسودات" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="المدققة موقعياً" name="site_audited" domain="[('state', '=', 'site_audited')]"/>
+                <filter string="المصادق عليها (معتمدة)" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="المرحلة محاسبياً" name="invoiced" domain="[('state', '=', 'invoiced')]"/>
+                <group>
+                    <filter string="المشروع" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="نوع السلفة" name="group_by_type" domain="[]" context="{'group_by': 'ipc_type'}"/>
+                    <filter string="الجهة (رب العمل / المقاول)" name="group_by_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="الحالة" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="تاريخ الذرعة" name="group_by_date" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions for Client and Subcontractor IPCs -->
+    <record id="action_contracting_client_ipc" model="ir.actions.act_window">
+        <field name="name">السلف المنجزة لرب العمل (Client IPCs)</field>
+        <field name="res_model">contracting.interim.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('ipc_type', '=', 'client')]</field>
+        <field name="context">{'default_ipc_type': 'client'}</field>
+        <field name="search_view_id" ref="view_contracting_interim_payment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ سلفة منجزة شهرية (IPC) جديدة لرب العمل لمطابقة الذرعات وإصدار الفاتورة التعاقدية!
+            </p>
+        </field>
+    </record>
+
+    <record id="action_contracting_subcontractor_ipc" model="ir.actions.act_window">
+        <field name="name">ذرعات وسلف المقاولين الثانويين (Subcontractor IPCs)</field>
+        <field name="res_model">contracting.interim.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('ipc_type', '=', 'subcontractor')]</field>
+        <field name="context">{'default_ipc_type': 'subcontractor'}</field>
+        <field name="search_view_id" ref="view_contracting_interim_payment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ كشف ذرعة دورية لمقاول ثانوي واحتساب استقطاعات تأمينات الصيانة وفاتورة الصرف!
+            </p>
+        </field>
+    </record>
+</odoo>

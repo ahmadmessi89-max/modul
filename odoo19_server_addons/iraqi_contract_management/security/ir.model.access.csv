@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_direct_supply_contract_user,direct.supply.contract.user,model_direct_supply_contract,group_iraqi_contract_user,1,1,1,0
+access_direct_supply_contract_manager,direct.supply.contract.manager,model_direct_supply_contract,group_iraqi_contract_manager,1,1,1,1
+access_direct_supply_contract_auditor,direct.supply.contract.auditor,model_direct_supply_contract,group_iraqi_contract_auditor,1,1,1,1
+access_direct_supply_line_user,direct.supply.contract.line.user,model_direct_supply_contract_line,group_iraqi_contract_user,1,1,1,1
+access_direct_supply_line_manager,direct.supply.contract.line.manager,model_direct_supply_contract_line,group_iraqi_contract_manager,1,1,1,1
+access_direct_supply_payment_user,direct.supply.payment.schedule.user,model_direct_supply_payment_schedule,group_iraqi_contract_user,1,1,1,0
+access_direct_supply_payment_manager,direct.supply.payment.schedule.manager,model_direct_supply_payment_schedule,group_iraqi_contract_manager,1,1,1,1
+access_direct_supply_payment_auditor,direct.supply.payment.schedule.auditor,model_direct_supply_payment_schedule,group_iraqi_contract_auditor,1,1,1,1
+access_direct_supply_document_user,direct.supply.document.user,model_direct_supply_document,group_iraqi_contract_user,1,1,1,1
+access_direct_supply_document_manager,direct.supply.document.manager,model_direct_supply_document,group_iraqi_contract_manager,1,1,1,1

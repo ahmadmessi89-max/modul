@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dedicated Contracting Project List View -->
+    <record id="view_project_project_tree_contracting" model="ir.ui.view">
+        <field name="name">project.project.list.contracting</field>
+        <field name="model">project.project</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <list string="المشاريع الإنشائية">
+                <field name="name" string="اسم المشروع"/>
+                <field name="partner_id" string="رب العمل / العميل"/>
+                <field name="contract_ref" string="رقم العقد والمناقصة"/>
+                <field name="contract_sign_date" string="تاريخ التوقيع" optional="show"/>
+                <field name="site_handover_date" string="تاريخ المباشرة" optional="show"/>
+                <field name="contract_duration_days" string="المدة (يوم)" optional="hide"/>
+                <field name="contract_value_tender" widget="monetary" string="قيمة الإحالة" sum="الإجمالي" optional="show"/>
+                <field name="vo_total_revenue" widget="monetary" string="أوامر الغيار" sum="الإجمالي" optional="show"/>
+                <field name="contract_value_current" widget="monetary" string="قيمة العقد الحالية" sum="إجمالي العقود"/>
+                <field name="total_executed_revenue" widget="monetary" string="الإنجاز المصادق" sum="إجمالي الإنجاز"/>
+                <field name="overall_project_progress" widget="progressbar" string="نسبة الإنجاز %"/>
+                <field name="advance_payment_balance" widget="monetary" string="متبقي السلفة التشغيلية" optional="show"/>
+                <field name="retention_balance_total" widget="monetary" string="أمانات الصيانة" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Inherit Project Kanban View to show Contracting Metrics (Safe for Mobile & Desktop) -->
+    <record id="view_project_project_kanban_contracting_inherit" model="ir.ui.view">
+        <field name="name">project.project.kanban.contracting.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <!-- 1. Ensure required fields are declared so search_read always fetches them -->
+            <xpath expr="//kanban" position="inside">
+                <field name="contract_ref"/>
+                <field name="contract_value_current"/>
+                <field name="currency_id"/>
+                <field name="boq_count"/>
+                <field name="ipc_client_count"/>
+                <field name="overall_project_progress"/>
+            </xpath>
+
+            <!-- 2. Display contract info under partner name safely -->
+            <xpath expr="//span[@name='partner_name']" position="after">
+                <div invisible="not contract_ref" class="text-muted d-flex align-items-baseline">
+                    <span class="fa fa-file-text-o me-2" title="رقم العقد"/>
+                    <field name="contract_ref"/>
+                </div>
+                <div invisible="not contract_value_current" class="text-muted d-flex align-items-baseline">
+                    <span class="fa fa-money me-2" title="قيمة العقد"/>
+                    <field name="contract_value_current" widget="monetary"/>
+                </div>
+            </xpath>
+
+            <!-- 3. Add Contracting boxes using native Odoo 19 fields (100% mobile safe) -->
+            <xpath expr="//div[hasclass('o_project_kanban_boxes')]" position="inside">
+                <a class="o_project_kanban_box me-1" name="action_view_boq" type="object" title="جدول الكميات (BOQ)">
+                    <div>
+                        <field name="boq_count" class="o_value"/>
+                        <span class="ms-1">فقرات BOQ</span>
+                    </div>
+                </a>
+                <a class="o_project_kanban_box me-1" name="action_view_client_ipcs" type="object" title="الذرعات والسلف">
+                    <div>
+                        <field name="ipc_client_count" class="o_value"/>
+                        <span class="ms-1">سلف منجزة</span>
+                    </div>
+                </a>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Dedicated Contracting Project Kanban View (Optimized for Mobile & Touch UI) -->
+    <record id="view_project_project_kanban_contracting" model="ir.ui.view">
+        <field name="name">project.project.kanban.contracting</field>
+        <field name="model">project.project</field>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard o_project_kanban" sample="1">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="contract_ref"/>
+                <field name="contract_value_current"/>
+                <field name="total_executed_revenue"/>
+                <field name="overall_project_progress"/>
+                <field name="advance_payment_balance"/>
+                <field name="retention_balance_total"/>
+                <field name="boq_count"/>
+                <field name="ipc_client_count"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="fs-5 text-primary"><field name="name"/></strong>
+                                <span class="badge rounded-pill bg-light text-dark border">
+                                    <field name="overall_project_progress" widget="progressbar"/>
+                                </span>
+                            </div>
+                            <div class="text-muted small mb-1" invisible="not partner_id">
+                                <i class="fa fa-user me-1" title="العميل / رب العمل"/> <field name="partner_id"/>
+                            </div>
+                            <div class="text-muted small mb-2" invisible="not contract_ref">
+                                <i class="fa fa-file-text-o me-1" title="رقم العقد الإنشائي"/> <field name="contract_ref"/>
+                            </div>
+                            <div class="row g-2 mb-2 text-center small border-top pt-2">
+                                <div class="col-6">
+                                    <div class="text-muted">قيمة العقد</div>
+                                    <strong class="text-dark"><field name="contract_value_current" widget="monetary"/></strong>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted">الإنجاز المصادق</div>
+                                    <strong class="text-success"><field name="total_executed_revenue" widget="monetary"/></strong>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-2 mt-1">
+                                <a role="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" name="action_view_boq" type="object">
+                                    <i class="fa fa-list-ol" title="فقرات جدول الكميات"/>
+                                    <span>فقرات BOQ (<field name="boq_count"/>)</span>
+                                </a>
+                                <a role="button" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1" name="action_view_client_ipcs" type="object">
+                                    <i class="fa fa-file-text-o" title="الذرعات والسلف"/>
+                                    <span>السلف (<field name="ipc_client_count"/>)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Inherit Project Form View for Iraqi Contracting Architecture -->
+    <record id="view_project_project_form_contracting_inherit" model="ir.ui.view">
+        <field name="name">project.project.form.contracting.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <!-- Smart Buttons in Stat Info Box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_boq" type="object" icon="fa-list-ol">
+                    <field string="جدول الكميات (BOQ)" name="boq_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_variation_orders" type="object" icon="fa-pencil-square-o">
+                    <field string="أوامر الغيار" name="vo_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_client_ipcs" type="object" icon="fa-file-text-o">
+                    <field string="سلف رب العمل" name="ipc_client_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_subcontractor_ipcs" type="object" icon="fa-users">
+                    <field string="ذرعات المقاولين" name="ipc_sub_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_site_deliveries" type="object" icon="fa-truck">
+                    <field string="إدخال موقعي" name="site_delivery_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_petty_cash" type="object" icon="fa-money">
+                    <field string="ذمة المهندس" name="petty_cash_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_view_residential_units" type="object" icon="fa-building" invisible="not is_residential_complex">
+                    <field string="الوحدات السكنية" name="residential_units_count" widget="statinfo"/>
+                </button>
+            </xpath>
+
+            <!-- Add Project Contracting Notebook Tabs -->
+            <xpath expr="//notebook" position="inside">
+                <page string="البيانات التعاقدية والسلف الموقعية" name="contracting_details">
+                    <group>
+                        <group string="بيانات العقد والإشراف الهندسي">
+                            <field name="is_residential_complex"/>
+                            <field name="contract_ref"/>
+                            <field name="contract_sign_date"/>
+                            <field name="site_handover_date"/>
+                            <field name="contract_duration_days"/>
+                            <field name="site_engineer_ids" widget="many2many_tags"/>
+                            <field name="analytic_account_id"/>
+                        </group>
+                        <group string="التقييم المالي للعقد والنسبة الكلية">
+                            <field name="contract_value_tender" widget="monetary"/>
+                            <field name="vo_total_revenue" widget="monetary"/>
+                            <field name="contract_value_current" widget="monetary"/>
+                            <field name="total_executed_revenue" widget="monetary"/>
+                            <field name="overall_project_progress" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="السلفة الأولية / التشغيلية">
+                            <field name="advance_payment_amount" widget="monetary"/>
+                            <field name="advance_payment_recovered" widget="monetary"/>
+                            <field name="advance_payment_balance" widget="monetary"/>
+                        </group>
+                        <group string="أمانات الصيانة والاستقطاعات النظامية">
+                            <field name="retention_balance_total" widget="monetary"/>
+                            <field name="total_boq_estimated_budget" widget="monetary"/>
+                            <field name="total_committed_costs" widget="monetary"/>
+                            <field name="total_actual_costs" widget="monetary"/>
+                        </group>
+                    </group>
+                </page>
+
+                <page string="جدول الكميات والتسعير (BOQ)" name="boq_lines_tab">
+                    <field name="boq_line_ids">
+                        <list decoration-info="state == 'draft'" decoration-warning="state == 'in_progress'" decoration-success="state == 'completed'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="item_no"/>
+                            <field name="name"/>
+                            <field name="package_id"/>
+                            <field name="uom_id"/>
+                            <field name="contract_qty"/>
+                            <field name="vo_qty" optional="show"/>
+                            <field name="revised_contract_qty"/>
+                            <field name="tender_unit_price" widget="monetary"/>
+                            <field name="revised_total_amount" widget="monetary" sum="إجمالي القيمة"/>
+                            <field name="total_estimated_budget" widget="monetary" sum="إجمالي الموازنة" optional="show"/>
+                            <field name="remaining_budget" widget="monetary" sum="المتبقي" optional="show"/>
+                            <field name="cumulative_qty"/>
+                            <field name="completion_percentage" widget="progressbar" string="الإنجاز %"/>
+                            <field name="boq_alert_state" widget="badge" decoration-success="boq_alert_state == 'normal'" decoration-warning="boq_alert_state == 'warning_80'" decoration-primary="boq_alert_state == 'warning_100'" decoration-danger="boq_alert_state == 'exceeded'" string="مؤشر الرقابة"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="أوامر الغيار (Variation Orders)" name="vos_tab">
+                    <field name="variation_order_ids" readonly="1">
+                        <list decoration-info="state == 'draft'" decoration-warning="state in ('submitted', 'engineer_approved')" decoration-success="state == 'client_approved'" decoration-danger="state == 'rejected'">
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="engineer_in_charge_id"/>
+                            <field name="client_ref"/>
+                            <field name="total_revenue_change" widget="monetary" sum="صافي الإيرادات"/>
+                            <field name="total_cost_budget_change" widget="monetary" sum="صافي الموازنة" optional="show"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="الذرعات والسلف المنجزة (IPCs)" name="ipcs_tab">
+                    <field name="interim_payment_ids" readonly="1">
+                        <list decoration-info="state == 'draft'" decoration-warning="state in ('site_audited', 'approved')" decoration-success="state == 'invoiced'" decoration-danger="state == 'cancelled'">
+                            <field name="name"/>
+                            <field name="ipc_type"/>
+                            <field name="partner_id"/>
+                            <field name="sequence_in_project"/>
+                            <field name="date"/>
+                            <field name="current_gross_amount" widget="monetary" sum="إنجاز الفترة"/>
+                            <field name="advance_deduction_amount" widget="monetary" sum="استرداد السلفة" optional="show"/>
+                            <field name="retention_amount" widget="monetary" sum="أمانات الصيانة" optional="show"/>
+                            <field name="net_payable_amount" widget="monetary" sum="الصافي المستحق"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="أذونات الإدخال المخزني الموقعي" name="site_deliveries_tab">
+                    <field name="site_delivery_ids" readonly="1">
+                        <list decoration-info="state == 'draft'" decoration-warning="state == 'inspected'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancelled'">
+                            <field name="name"/>
+                            <field name="delivery_type"/>
+                            <field name="partner_id"/>
+                            <field name="delivery_note_ref"/>
+                            <field name="date"/>
+                            <field name="total_amount" widget="monetary" sum="الإجمالي"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="كشوفات السلفة النقدية (ذمة المهندس)" name="petty_cash_tab">
+                    <field name="petty_cash_ids" readonly="1">
+                        <list decoration-info="state == 'draft'" decoration-warning="state in ('submitted', 'approved')" decoration-success="state == 'settled'">
+                            <field name="name"/>
+                            <field name="engineer_id"/>
+                            <field name="date"/>
+                            <field name="custody_amount" widget="monetary"/>
+                            <field name="total_spent_amount" widget="monetary" sum="المنصرف"/>
+                            <field name="balance_remaining" widget="monetary" sum="المتبقي"/>
+                            <field name="state" widget="badge"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="المجمع السكني وتصنيف المخازن" name="residential_complex_tab" invisible="not is_residential_complex">
+                    <group>
+                        <group string="إحصائيات الوحدات السكنية">
+                            <field name="residential_units_count"/>
+                            <field name="sold_units_count"/>
+                        </group>
+                        <group string="مخازن المجمع السكني الثلاثية">
+                            <field name="infrastructure_warehouse_id"/>
+                            <field name="finishing_warehouse_id"/>
+                            <field name="maintenance_warehouse_id"/>
+                        </group>
+                    </group>
+                    <field name="residential_unit_ids">
+                        <list>
+                            <field name="name"/>
+                            <field name="block"/>
+                            <field name="unit_type"/>
+                            <field name="built_area_sqm"/>
+                            <field name="status" widget="badge"/>
+                            <field name="accumulated_cost" widget="monetary" sum="إجمالي الكلفة"/>
+                            <field name="target_selling_price" widget="monetary" sum="إجمالي البيع"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Window Action for Contracting Projects -->
+    <record id="action_contracting_projects_dashboard" model="ir.actions.act_window">
+        <field name="name">المشاريع الإنشائية</field>
+        <field name="res_model">project.project</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="mobile_view_mode">kanban</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_project_project_kanban_contracting')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_project_project_tree_contracting')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('project.edit_project')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مشروعك الإنشائي الجديد لبدء إدارة جداول الكميات والذرعات الشهرية!
+            </p>
+        </field>
+    </record>
+</odoo>

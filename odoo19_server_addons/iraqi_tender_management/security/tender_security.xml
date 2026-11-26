@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Security Category -->
+        <record id="module_category_iraqi_tenders" model="ir.module.category">
+            <field name="name">إدارة المناقصات والعطاءات</field>
+            <field name="description">صلاحيات إدارة المناقصات والدعوات المباشرة وتحليل العطاءات والإحالة</field>
+            <field name="sequence">42</field>
+        </record>
+
+        <!-- Privilege for Odoo 19 Groups -->
+        <record id="res_groups_privilege_iraqi_tender" model="res.groups.privilege">
+            <field name="name">إدارة المناقصات</field>
+            <field name="sequence">10</field>
+            <field name="category_id" ref="module_category_iraqi_tenders"/>
+        </record>
+
+        <!-- User Groups -->
+        <!-- 1. Tender Officer -->
+        <record id="group_iraqi_tender_user" model="res.groups">
+            <field name="name">موظف المناقصات والعطاءات (Tender Officer)</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_iraqi_tender"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">يستطيع تسجيل المناقصات، إدخال الكلف التخمينية، وتسجيل العطاءات المقدمة.</field>
+        </record>
+
+        <!-- 2. Tender Manager / Committee Head -->
+        <record id="group_iraqi_tender_manager" model="res.groups">
+            <field name="name">مدير المناقصات ولجنة التحليل (Tender Manager)</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_iraqi_tender"/>
+            <field name="implied_ids" eval="[(4, ref('group_iraqi_tender_user'))]"/>
+            <field name="comment">يستطيع اعتماد إعلانات المناقصات، مصادقة محاضر لجان التحليل، وإصدار قرارات الإحالة وإنشاء العقود.</field>
+        </record>
+
+        <!-- Admin Access -->
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_iraqi_tender_manager'))]"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- Multi-Company Rule -->
+        <record id="iraqi_tender_announcement_multi_company_rule" model="ir.rule">
+            <field name="name">Iraqi Tender Multi-Company</field>
+            <field name="model_id" ref="model_iraqi_tender_announcement"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

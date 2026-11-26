@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hotel Daily Revenue List View -->
+    <record id="view_hotel_daily_revenue_list" model="ir.ui.view">
+        <field name="name">hotel.daily.revenue.list</field>
+        <field name="model">hotel.daily.revenue</field>
+        <field name="arch" type="xml">
+            <list string="كشوفات الإيرادات والسيولة اليومية للفنادق">
+                <field name="name"/>
+                <field name="hotel_name"/>
+                <field name="date"/>
+                <field name="room_revenue" widget="monetary" sum="إجمالي الغرف"/>
+                <field name="fnb_revenue" widget="monetary" sum="إجمالي المطاعم"/>
+                <field name="banquet_revenue" widget="monetary" sum="إجمالي القاعات"/>
+                <field name="total_daily_revenue" widget="monetary" sum="إجمالي الإيرادات"/>
+                <field name="cash_collected" widget="monetary" sum="إجمالي النقد"/>
+                <field name="pos_card_collected" widget="monetary" sum="إجمالي البطاقات"/>
+                <field name="transfer_amount" widget="monetary" sum="إجمالي المحول للمقاولات"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-primary="state == 'audited'" decoration-success="state == 'posted'" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Hotel Daily Revenue Form View -->
+    <record id="view_hotel_daily_revenue_form" model="ir.ui.view">
+        <field name="name">hotel.daily.revenue.form</field>
+        <field name="model">hotel.daily.revenue</field>
+        <field name="arch" type="xml">
+            <form string="كشف إيراد وسيولة فندقية يومية">
+                <header>
+                    <button name="action_audit" string="تدقيق وقفل اليوم (Night Audit)" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_post_to_accounting" string="ترحيل للخزينة والحسابات" type="object" class="btn-success" invisible="state != 'audited'"/>
+                    <button name="action_cancel" string="إلغاء الكشف" type="object" invisible="state in ['posted', 'cancelled']"/>
+                    <button name="action_reset_draft" string="إعادة للمسودة" type="object" invisible="state not in ['audited', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,audited,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="رقم الكشف اليومي"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <label for="hotel_name" string="اسم الفندق"/>
+                        <h2><field name="hotel_name" placeholder="فندق ريانة العود"/></h2>
+                    </div>
+                    <group>
+                        <group string="بيانات اليومية الفندقية">
+                            <field name="date"/>
+                            <field name="auditor_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="الربط المحاسبي وتغذية المقاولات">
+                            <field name="journal_id"/>
+                            <field name="move_id" readonly="1"/>
+                            <field name="transfer_to_contracting"/>
+                            <field name="transfer_amount" widget="monetary" invisible="not transfer_to_contracting"/>
+                            <field name="destination_project_id" invisible="not transfer_to_contracting"/>
+                            <field name="destination_journal_id" invisible="not transfer_to_contracting"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="تبويب الإيرادات المقفلة (Revenue Breakdown)">
+                            <field name="room_revenue" widget="monetary"/>
+                            <field name="fnb_revenue" widget="monetary"/>
+                            <field name="banquet_revenue" widget="monetary"/>
+                            <field name="laundry_services_revenue" widget="monetary"/>
+                            <field name="other_revenue" widget="monetary"/>
+                            <field name="total_daily_revenue" widget="monetary" class="oe_subtotal_footer_separator" style="font-weight: bold; font-size: 1.1em; color: #2e7d32;"/>
+                        </group>
+                        <group string="مصفوفة التحصيل والسيولة (Collections Matrix)">
+                            <field name="cash_collected" widget="monetary"/>
+                            <field name="pos_card_collected" widget="monetary"/>
+                            <field name="corporate_receivables" widget="monetary"/>
+                            <field name="total_collections" widget="monetary" class="oe_subtotal_footer_separator" style="font-weight: bold;"/>
+                            <field name="variance_amount" widget="monetary" decoration-danger="variance_amount != 0"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="ملاحظات وتوصيات التدقيق" name="notes">
+                            <field name="notes" placeholder="ملاحظات مدقق الليل، نسب الإشغال، الحفلات المنعقدة، فروقات الخزينة..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Hotel Daily Revenue Action -->
+    <record id="action_hotel_daily_revenue" model="ir.actions.act_window">
+        <field name="name">كشوفات الإيرادات والسيولة اليومية للفنادق</field>
+        <field name="res_model">hotel.daily.revenue</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                قم بإدخال كشف الإيرادات اليومية المقفلة للفندق لتحويل السيولة وتغذية التدفقات النقدية!
+            </p>
+        </field>
+    </record>
+</odoo>
